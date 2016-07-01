@@ -1,15 +1,26 @@
 ﻿using UnityEngine;
 using System.Collections;
-using Windows.Kinect;
 using System.Collections.Generic;
 
 
 [System.Serializable]
-[RequireComponent(typeof(MultiSourceManager))]
-public class KinectPCL : MonoBehaviour {
+[RequireComponent(typeof(KinectManager))]
+public class KinectPCLK1 : MonoBehaviour {
 
-    public static KinectPCL instance;
-    private MultiSourceManager multiSourceManager;
+    const float CENTRALPOINT_X = 314.649173f;
+    const float CENTRALPOINT_Y = 240.160459f;
+    const float FOCAL_X = 572.882768f;
+    const float FOCAL_Y = 542.739980f;
+    const float FOCAL_X_INV = 1f / FOCAL_X;
+    const float FOCAL_Y_INV = 1f / FOCAL_Y;
+
+    public const int DEPTH_WIDTH = 640;
+    public const int DEPTH_HEIGHT = 480;
+
+
+    public static KinectPCLK1 instance;
+
+    private KinectManager manager;
 
 
     public bool debug;
@@ -21,7 +32,10 @@ public class KinectPCL : MonoBehaviour {
 
     [HideInInspector]
     public PCLPoint[] points;
-
+    [HideInInspector]
+    public PointOctree<PCLPoint> roiTree;
+    [HideInInspector]
+    public List<PCLPoint> roiPoints;
 
     [Range(0,1)]
     public float bodyRandomProba;
@@ -35,7 +49,6 @@ public class KinectPCL : MonoBehaviour {
     public List<PCLPoint> bodyPoints;
 
     public Vector3 bodyCenter;
-
 
     [HideInInspector]
     public int numPoints;
@@ -58,6 +71,21 @@ public class KinectPCL : MonoBehaviour {
     [HideInInspector]
     public Vector2[] dsOffsetRandoms;
 
+    [Range(0, 10)]
+    public float minDepth = 0;
+    [Range(0, 10)]
+    public float maxDepth = 10;
+    [Range(-5, 5)]
+    public float leftLimit = -5;
+    [Range(-5, 5)]
+    public float rightLimit = 5;
+    [Range(-5, 5)]
+    public float bottomLimit = -5;
+    [Range(-5, 5)]
+    public float topLimit = 5;
+
+   
+
     void Awake()
     {
         instance = this;
@@ -65,10 +93,13 @@ public class KinectPCL : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        multiSourceManager = GetComponent<MultiSourceManager>();
+        manager = GetComponent<KinectManager>();
+
         bodyCenter = Vector3.zero;
         bodyPoints = new List<PCLPoint>();
         points = new PCLPoint[0];
+        roiPoints = new List<PCLPoint>();
+
         dsOffsetRandoms = new Vector2[0];
         numPoints = 0;
 
@@ -87,17 +118,18 @@ public class KinectPCL : MonoBehaviour {
             lastDownSample = downSample;
             return;
         }
+        
 
-        CameraSpacePoint[] realWorldMap = multiSourceManager.GetRealWorldData();
-        byte[] bodyIndexMap = multiSourceManager.GetBodyIndexData();
-        //Texture2D tex = multiSourceManager.GetColorTexture();
-
-
+        ushort[] depthMap = manager.GetRawDepthMap();
+            
         bodyTree = new PointOctree<PCLPoint>(10,bodyCenter,.01f); //take previous frame
+        roiTree = new PointOctree<PCLPoint>(10, Vector3.zero, .01f); //take previous frame
+        roiPoints.Clear();
+
         bodyPoints.Clear();
         bodyCenter = new Vector3();
 
-
+        
 
         for(int ix = 0; ix < pointsWidth; ix++)
         {
@@ -105,29 +137,55 @@ public class KinectPCL : MonoBehaviour {
             {
                 int dsIndex = iy * pointsWidth + ix;
 
-                Vector2 rIndex = dsOffsetRandoms[dsIndex];
+                Vector2 drIndex = dsOffsetRandoms[dsIndex];
+                int dIndexX = (int)(drIndex.x * DEPTH_WIDTH);
+                int dIndexY = (int)(drIndex.y * DEPTH_HEIGHT);
 
-                int index = Mathf.RoundToInt(rIndex.x *multiSourceManager.DepthHeight * multiSourceManager.DepthWidth) + Mathf.RoundToInt(rIndex.y * multiSourceManager.DepthWidth);
+                int index = dIndexY * DEPTH_WIDTH + dIndexX;
 
-                //Vector3 dv = new Vector3(rIndex.x * 10, rIndex.y * 10);
+                if (index >= DEPTH_WIDTH * DEPTH_HEIGHT)
+                {
+                    Debug.Log(" > size");
+                    continue;
+                }
 
-                //Debug.DrawLine(dv, dv + Vector3.forward * .2f, Color.red);
+                ushort um = (ushort)(depthMap[index] & 7);
+
                 
+                if (um == 0) um = 255;
+                else um = (byte)(um % 4);
+                ushort d = (ushort)(depthMap[index] >> 3);
 
-                if (index >= realWorldMap.Length) continue;
+                bool isValid = d > 0;
+                Vector3 p;
 
+                if (isValid)
+                {
+                    float z_metric = d * 0.001f;
+
+                    float tx = z_metric * ((dIndexX - CENTRALPOINT_X) * FOCAL_X_INV);
+                    float ty = z_metric * ((dIndexY - CENTRALPOINT_Y) * FOCAL_Y_INV);
+
+                    p = new Vector3(tx, -ty, z_metric);
+                }
+                else
+                {
+                    p = Vector3.zero;
+                }
+
+                bool isInROI = true;
+                if (!isValid ||  p.z < minDepth || p.z > maxDepth
+                    || p.x < leftLimit || p.x > rightLimit
+                    || p.y < bottomLimit || p.y > topLimit) isInROI = false;
                 
-                CameraSpacePoint csp = realWorldMap[index];
-                Vector3 p = new Vector3(csp.X, csp.Y, csp.Z);
 
                 Vector3 tPoint = transform.TransformPoint(p);
 
                 int tIndex = iy * pointsWidth + ix;
-                bodyMask[tIndex] = bodyIndexMap[index] != 255;
+                bodyMask[tIndex] = um != 255;
 
                 bool isBody = bodyMask[tIndex];
-                bool isValid = true;
-
+               
                 if(isBody)
                 {
                     if (bodyRandomProba < 1)
@@ -135,23 +193,23 @@ public class KinectPCL : MonoBehaviour {
                         isBody = Random.value <= bodyRandomProba;
                     }
                 }
+                
 
-                if (float.IsNaN(tPoint.x) || float.IsInfinity(tPoint.x))
-                {
-                    isValid = false;
-                    tPoint = Vector3.zero;
-                }
-
-                PCLPoint pp = new PCLPoint(tPoint, isBody, isValid,true);
+                PCLPoint pp = new PCLPoint(tPoint, isBody, isValid, isInROI);
                 points[tIndex] = pp;
 
                 
-                if(isBody && isValid) 
+                if( isValid) 
                 {
-                    bodyPoints.Add(pp);
+                    roiTree.Add(pp, tPoint);
+                    roiPoints.Add(pp);
+                    if (isBody)
+                    {
+                        bodyPoints.Add(pp);
 
-                    bodyTree.Add(pp, tPoint);
-                    bodyCenter += tPoint;
+                        bodyTree.Add(pp, tPoint);
+                        bodyCenter += tPoint;
+                    }
                 }
 
                 if (debug && isValid)
@@ -159,8 +217,9 @@ public class KinectPCL : MonoBehaviour {
                    
                     if (isBody || !debugBodyOnly)
                     {
-                        Color c = isBody ? Color.yellow : Color.white;
-                        Debug.DrawLine(tPoint, tPoint + Vector3.forward * .05f, c);
+
+                        Color c = isInROI ? (isBody ? Color.yellow : Color.white) : Color.gray;
+                        Debug.DrawRay(tPoint,Vector3.forward * .1f, c);
                     }
                 }
 
@@ -180,9 +239,10 @@ public class KinectPCL : MonoBehaviour {
         if(saveConfigOnExit) saveConfig();
     }
 
-    void OnDrawGizmos()
+    void OnDrawGizmosSelected()
     {
-        //Gizmos.DrawWireCube(bodyCenter,Vector3.one*2);
+        Gizmos.DrawWireCube(transform.TransformPoint((rightLimit+leftLimit)/2,(bottomLimit+topLimit)/2,(minDepth+maxDepth)/2),
+                            Vector3.Scale(new Vector3(rightLimit-leftLimit,topLimit-bottomLimit,maxDepth-minDepth),transform.localScale));
     }
 
 
@@ -203,8 +263,8 @@ public class KinectPCL : MonoBehaviour {
     
     void updateDownSample()
     {
-        pointsWidth = Mathf.FloorToInt(multiSourceManager.DepthWidth / downSample);
-        pointsHeight = Mathf.FloorToInt(multiSourceManager.DepthHeight / downSample);
+        pointsWidth = Mathf.FloorToInt(DEPTH_WIDTH / downSample);
+        pointsHeight = Mathf.FloorToInt(DEPTH_HEIGHT / downSample);
         numPoints = pointsWidth * pointsHeight;
 
         points = new PCLPoint[numPoints];
@@ -223,8 +283,8 @@ public class KinectPCL : MonoBehaviour {
             {
                 int dsIndex = iy * pointsWidth + ix;
 
-                float itx = ix * 1f / pointsWidth;// * multiSourceManager.DepthWidth;
-                float ity = iy * 1f / pointsHeight;// * multiSourceManager.DepthHeight / pointsHeight;
+                float itx = ix * 1f / pointsWidth;// * k1Provider.DepthWidth;
+                float ity = iy * 1f / pointsHeight;// * k1Provider.DepthHeight / pointsHeight;
 
                 float downSampleRandomFactor = 1f / downSample;
                 dsOffsetRandoms[dsIndex].x = Mathf.Clamp01(Random.Range(itx - downSampleRandomXOffset * downSampleRandomFactor, itx + downSampleRandomXOffset * downSampleRandomFactor));

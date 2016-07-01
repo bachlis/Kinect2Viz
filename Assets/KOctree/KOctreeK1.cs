@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class KOctree : MonoBehaviour {
+public class KOctreeK1 : MonoBehaviour {
     
     public bool debugPoints;
     public bool debugBounds;
@@ -20,6 +20,10 @@ public class KOctree : MonoBehaviour {
     public Color farColor;
 
     public Material lineMat;
+
+    public bool bodyOnly;
+
+    public float texSpeed = 0;
 
     public void OnEnable()
     {
@@ -43,19 +47,21 @@ public class KOctree : MonoBehaviour {
 
     void postRender(Camera cam)
     {
+        if (cam != Camera.main) return;
 
-        List<PCLPoint> bodyPoints = KinectPCL.instance.bodyPoints;
-        PointOctree<PCLPoint> po = KinectPCL.instance.bodyTree;
+        List<PCLPoint> tPoints = bodyOnly ? KinectPCLK1.instance.bodyPoints : KinectPCLK1.instance.roiPoints;
+        PointOctree<PCLPoint> po = bodyOnly ? KinectPCLK1.instance.bodyTree : KinectPCLK1.instance.roiTree;
 
-        if (po.Count == 0 || po.Count == KinectPCL.instance.numPoints) return;
+        if (po.Count == 0 || (bodyOnly && po.Count == KinectPCLK1.instance.numPoints)) return;
 
         if (!processLines) return;
 
-        GL.Begin(GL.LINES);
         lineMat.SetPass(0);
 
-        foreach (PCLPoint p in bodyPoints)
+        foreach (PCLPoint p in tPoints)
         {
+            if (!p.isInROI) continue;
+
             Ray r = new Ray(p.position, Vector3.forward);
             PCLPoint[] np = po.GetNearby(r, maxDistance);
             
@@ -67,26 +73,32 @@ public class KOctree : MonoBehaviour {
                 {
                     float dist = Vector3.Distance(npp.position, p.position);
                     float targetAlpha = alphaDecay.Evaluate(dist / maxDistance);
-                    
+
+                    GL.Begin(GL.LINES);
                     GL.Color(Color.Lerp(nearColor,farColor,targetAlpha));
-                    GL.TexCoord(new Vector3(Time.time*targetAlpha, 0, 0));
+                    
+                    GL.TexCoord(Vector3.zero);
+                    GL.TexCoord(new Vector3(Time.time*texSpeed*targetAlpha, 0, 0));
                     GL.Vertex(npp.position);
-                    GL.TexCoord(new Vector3(Time.time* targetAlpha+1, 0, 0));
+
+                    GL.TexCoord(Vector3.one);
+                    GL.TexCoord(new Vector3(Time.time*texSpeed*targetAlpha+1, 0, 0));
                     GL.Vertex(p.position);
+                    GL.End();
                 }
             }
             
         }
         
-        GL.End();
+       // GL.End();
 
     }
 
     void OnDrawGizmos()
     {
-        if (KinectPCL.instance == null) return;
+        if (KinectPCLK1.instance == null) return;
 
-        PointOctree<PCLPoint> po = KinectPCL.instance.bodyTree;
+        PointOctree<PCLPoint> po = bodyOnly?KinectPCLK1.instance.bodyTree:KinectPCLK1.instance.roiTree;
         if (po == null) return;
 
         if (debugPoints) po.DrawAllObjects();
