@@ -26,7 +26,7 @@ namespace Spout{
 		private bool senderIsCreated;
 
 		private Camera _cam;
-		public bool renderOverlay;
+        
 
 		//make this public if you want
 		//It's better you set this always to true!

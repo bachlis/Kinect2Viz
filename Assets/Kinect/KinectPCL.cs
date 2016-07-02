@@ -142,7 +142,7 @@ public class KinectPCL : MonoBehaviour {
                     tPoint = Vector3.zero;
                 }
 
-                PCLPoint pp = new PCLPoint(tPoint, isBody, isValid,true);
+                PCLPoint pp = new PCLPoint(tPoint, isBody, isValid,true, isBody ? Color.yellow : Color.white);
                 points[tIndex] = pp;
 
                 

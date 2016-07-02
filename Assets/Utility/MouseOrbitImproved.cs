@@ -4,14 +4,19 @@
 using UnityEngine;
 using System.Collections;
 
-public class MouseOrbitImproved : MonoBehaviour
+[ExecuteInEditMode]
+public class MouseOrbitImproved : OSCControllable
 {
     public Transform target;
+
+    [OSCProperty("target")]
     public Vector3 targetOffset;
 
+    [OSCProperty("distance")]
     public float distance = 5.0f;
-    float xSpeed = 20.0f;
-    float ySpeed = 20.0f;
+
+    public float xSpeed = 20.0f;
+    public float ySpeed = 20.0f;
 
     float yMinLimit = -90;
     float yMaxLimit = 90;
@@ -19,10 +24,12 @@ public class MouseOrbitImproved : MonoBehaviour
     float distanceMin = 1;
     float distanceMax = 500;
 
-    private float x = 0.0f;
-    private float y = 0.0f;
+    [OSCProperty("x")]
+    public float x = 0.0f;
+    [OSCProperty("y")]
+    public float y = 0.0f;
 
-    float smoothTime = 0.2f;
+    public float smoothTime = 0.2f;
 
     private float xSmooth = 0.0f;
     private float ySmooth = 0.0f;
@@ -33,9 +40,8 @@ public class MouseOrbitImproved : MonoBehaviour
     //private FIXME_VAR_TYPE posVelocity= Vector3.zero;
 
 
-    void Start()
+    public override void Start()
     {
-
     }
 
     void LateUpdate()
@@ -52,9 +58,15 @@ public class MouseOrbitImproved : MonoBehaviour
 
             }
 
-            xSmooth = Mathf.SmoothDamp(xSmooth, x, ref xVelocity, smoothTime);
-            ySmooth = Mathf.SmoothDamp(ySmooth, y, ref yVelocity, smoothTime);
-
+            if (Application.isPlaying)
+            {
+                xSmooth = Mathf.SmoothDamp(xSmooth, x, ref xVelocity, smoothTime);
+                ySmooth = Mathf.SmoothDamp(ySmooth, y, ref yVelocity, smoothTime);
+            }else
+            {
+                xSmooth = x;
+                ySmooth = y;
+            }
 
             distance = Mathf.Clamp(distance - Input.GetAxis("Mouse ScrollWheel") * distance, distanceMin, distanceMax);
 
@@ -63,5 +75,11 @@ public class MouseOrbitImproved : MonoBehaviour
             transform.position = transform.rotation * new Vector3(0.0f, 0.0f, -distance) + target.position + targetOffset;
 
         }
+    }
+
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireCube(target.transform.position+targetOffset, Vector3.one * 1f);
     }
 }

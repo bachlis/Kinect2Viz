@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class KOctreeK1 : MonoBehaviour {
+public class KOctreeK1 : OSCControllable {
     
     public bool debugPoints;
     public bool debugBounds;
@@ -13,16 +13,21 @@ public class KOctreeK1 : MonoBehaviour {
     
     public AnimationCurve alphaDecay;
 
+    [OSCProperty("maxDistance")]
     [Range(0.005f,2)]
     public float maxDistance;
 
+    [OSCProperty("nearColor")]
     public Color nearColor;
+    [OSCProperty("farColor")]
     public Color farColor;
 
     public Material lineMat;
 
+    [OSCProperty("bodyOnly")]
     public bool bodyOnly;
 
+    [OSCProperty("textureSpeed")]
     public float texSpeed = 0;
 
     public void OnEnable()
@@ -37,11 +42,11 @@ public class KOctreeK1 : MonoBehaviour {
     }
 
     // Use this for initialization
-    void Start () {
+    public override void Start () {
 	}
-	
-	// Update is called once per frame
-	void Update () {
+
+    // Update is called once per frame
+    public override void Update () {
        
     }
 

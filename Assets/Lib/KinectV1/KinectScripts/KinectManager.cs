@@ -121,7 +121,7 @@ public class KinectManager : MonoBehaviour
 	
 	// User Map vars.
 	private Texture2D usersLblTex;
-	private Color32[] usersMapColors;
+	public Color32[] usersMapColors;
 	private ushort[] usersPrevState;
 	private Rect usersMapRect;
 	private int usersMapSize;
@@ -1130,6 +1130,7 @@ public class KinectManager : MonoBehaviour
 				ProcessSkeleton();
 			}
 			
+            /*
 			// Update player 1's models if he/she is calibrated and the model is active.
 			if(Player1Calibrated)
 			{
@@ -1299,6 +1300,7 @@ public class KinectManager : MonoBehaviour
 					}
 				}
 			}
+            */
 		}
 		
 		// Kill the program with ESC.
@@ -1318,8 +1320,18 @@ public class KinectManager : MonoBehaviour
 			instance = null;
 		}
 	}
-	
-	// Draw the Histogram Map on the GUI.
+
+    void OnDestroy()
+    {
+        if (KinectInitialized)
+        {
+            // Shutdown OpenNI
+            KinectWrapper.NuiShutdown();
+            instance = null;
+        }
+    }
+
+    // Draw the Histogram Map on the GUI.
     void OnGUI()
     {
 		if(KinectInitialized)
