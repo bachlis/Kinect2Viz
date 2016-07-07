@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿/*using UnityEngine;
 using UnityEditor;
 
 public class AssignMaterial : ScriptableWizard
@@ -38,4 +38,4 @@ public class AssignMaterial : ScriptableWizard
     {
         ScriptableWizard.DisplayWizard<AssignMaterial>("Assign Material", "Assign");
     }
-}
+}//*/

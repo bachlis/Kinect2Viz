@@ -52,7 +52,7 @@ public class KOctreeK1 : OSCControllable {
 
     void postRender(Camera cam)
     {
-        if (cam != Camera.main) return;
+        //if (cam != Camera.main) return;
 
         List<PCLPoint> tPoints = bodyOnly ? KinectPCLK1.instance.bodyPoints : KinectPCLK1.instance.roiPoints;
         PointOctree<PCLPoint> po = bodyOnly ? KinectPCLK1.instance.bodyTree : KinectPCLK1.instance.roiTree;
