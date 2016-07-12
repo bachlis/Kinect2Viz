@@ -100,7 +100,7 @@ public class MouseOrbitImprovedBody : OSCControllable
 
             distance = Mathf.Clamp(distance - Input.GetAxis("Mouse ScrollWheel") * distance, distanceMin, distanceMax);
 
-            if (Application.isPlaying && bodySmoothTime > 0)
+            if (Application.isPlaying && smoothTime > 0)
             {
                 xSmooth = Mathf.SmoothDamp(xSmooth, x, ref xVelocity, smoothTime);
                 ySmooth = Mathf.SmoothDamp(ySmooth, y, ref yVelocity, smoothTime);
