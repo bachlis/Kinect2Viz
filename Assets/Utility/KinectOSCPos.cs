@@ -17,6 +17,6 @@ public class KinectOSCPos : OSCControllable
     // Update is called once per frame
     public override void Update () {
         transform.localPosition = pos;
-        transform.localRotation = Quaternion.Euler(rot);
+        transform.rotation = Quaternion.Euler(rot);
     }
 }

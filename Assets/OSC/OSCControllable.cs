@@ -45,9 +45,11 @@ public class OSCControllable : MonoBehaviour {
 
         string typeString = info.FieldType.ToString();
 
+        Debug.Log("OSC IN TYPE : " + typeString +" " + values[0].ToString());
+
         // if we detect any attribute print out the data.
 
-        if (typeString == "System.Single")
+                if (typeString == "System.Single")
         {
             if(values.Count >= 1) info.SetValue(this, getFloat(values[0]));
         }else if(typeString == "System.Boolean")
@@ -69,6 +71,11 @@ public class OSCControllable : MonoBehaviour {
         {
             if (values.Count >= 4) info.SetValue(this, new Color(getFloat(values[0]), getFloat(values[1]), getFloat(values[2]), getFloat(values[3])));
             else if(values.Count >= 3) info.SetValue(this, new Color(getFloat(values[0]), getFloat(values[1]), getFloat(values[2]),1));
+        }
+        else if (typeString == "System.String")
+        {
+           // Debug.Log("String received : " + values.ToString());
+            info.SetValue(this, values[0].ToString());
         }
     }
 

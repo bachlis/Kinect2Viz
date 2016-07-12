@@ -21,7 +21,7 @@ public class MouseOrbitImproved : OSCControllable
     float yMinLimit = -90;
     float yMaxLimit = 90;
 
-    float distanceMin = 1;
+    float distanceMin = 0.1f;
     float distanceMax = 500;
 
     [OSCProperty("x")]
