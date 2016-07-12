@@ -47,7 +47,7 @@ public class KinectPCLK1 : OSCControllable {
     [HideInInspector]
     public List<PCLPoint> bodyPoints;
 
-    public Vector3 bodyCenter;
+    public static Vector3 bodyCenter;
 
     [HideInInspector]
     public int numPoints;

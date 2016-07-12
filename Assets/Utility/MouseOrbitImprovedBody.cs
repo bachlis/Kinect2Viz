@@ -11,12 +11,10 @@ public class MouseOrbitImprovedBody : OSCControllable
 
     [OSCProperty("target")]
     public Vector3 targetOffset;
+    private Vector3 realTarget;
 
     [OSCProperty("distance")]
     public float distance = 5.0f;
-
-    public float xSpeed = 20.0f;
-    public float ySpeed = 20.0f;
 
     float yMinLimit = -90;
     float yMaxLimit = 90;
@@ -31,6 +29,9 @@ public class MouseOrbitImprovedBody : OSCControllable
 
     [OSCProperty("smooth")]
     public float smoothTime = 0.2f;
+
+    public float xSpeed = 20.0f;
+    public float ySpeed = 20.0f;
 
     private float xSmooth = 0.0f;
     private float ySmooth = 0.0f;
@@ -48,6 +49,15 @@ public class MouseOrbitImprovedBody : OSCControllable
     //private FIXME_VAR_TYPE posSmooth= Vector3.zero;
     //private FIXME_VAR_TYPE posVelocity= Vector3.zero;
 
+    [OSCProperty("usebody")]
+    public bool useBody;
+    [OSCProperty("bodySmooth")]
+    public float bodySmoothTime = 0.2f;
+    [OSCProperty("bodyOffset")]
+    public Vector3 bodyOffset;
+    private Vector3 bodyPosSmooth;
+    private Vector3 bodyPosVelocity;
+
 
     public override void Start()
     {
@@ -55,6 +65,27 @@ public class MouseOrbitImprovedBody : OSCControllable
 
     void LateUpdate()
     {
+        if (useBody && KinectPCLK1.realBodyOnly)
+        {
+            if (Application.isPlaying && bodySmoothTime > 0)
+            {
+                bodyPosSmooth.x = Mathf.SmoothDamp(bodyPosSmooth.x, KinectPCLK1.bodyCenter.x + bodyOffset.x, ref bodyPosVelocity.x, bodySmoothTime);
+                bodyPosSmooth.y = Mathf.SmoothDamp(bodyPosSmooth.y, KinectPCLK1.bodyCenter.y + bodyOffset.y, ref bodyPosVelocity.y, bodySmoothTime);
+                bodyPosSmooth.z = Mathf.SmoothDamp(bodyPosSmooth.z, KinectPCLK1.bodyCenter.z + bodyOffset.z, ref bodyPosVelocity.z, bodySmoothTime);
+            }
+            else
+            {
+                bodyPosSmooth.x = KinectPCLK1.bodyCenter.x + bodyOffset.x;
+                bodyPosSmooth.y = KinectPCLK1.bodyCenter.y + bodyOffset.y;
+                bodyPosSmooth.z = KinectPCLK1.bodyCenter.z + bodyOffset.z;
+            }
+
+            realTarget = targetOffset + bodyPosSmooth;
+
+        } else {
+            realTarget = targetOffset;
+        }
+
         if (target)
         {
             if (Input.GetMouseButton(0))
@@ -69,23 +100,23 @@ public class MouseOrbitImprovedBody : OSCControllable
 
             distance = Mathf.Clamp(distance - Input.GetAxis("Mouse ScrollWheel") * distance, distanceMin, distanceMax);
 
-            if (Application.isPlaying)
+            if (Application.isPlaying && bodySmoothTime > 0)
             {
                 xSmooth = Mathf.SmoothDamp(xSmooth, x, ref xVelocity, smoothTime);
                 ySmooth = Mathf.SmoothDamp(ySmooth, y, ref yVelocity, smoothTime);
                 distSmooth = Mathf.SmoothDamp(distSmooth, distance, ref distVelocity, smoothTime);
-                txSmooth = Mathf.SmoothDamp(txSmooth, targetOffset.x, ref txVelocity, smoothTime);
-                tySmooth = Mathf.SmoothDamp(tySmooth, targetOffset.y, ref tyVelocity, smoothTime);
-                tzSmooth = Mathf.SmoothDamp(tzSmooth, targetOffset.z, ref tzVelocity, smoothTime);
+                txSmooth = Mathf.SmoothDamp(txSmooth, realTarget.x, ref txVelocity, smoothTime);
+                tySmooth = Mathf.SmoothDamp(tySmooth, realTarget.y, ref tyVelocity, smoothTime);
+                tzSmooth = Mathf.SmoothDamp(tzSmooth, realTarget.z, ref tzVelocity, smoothTime);
             }
             else
             {
                 xSmooth = x;
                 ySmooth = y;
                 distSmooth = distance;
-                txSmooth = targetOffset.x;
-                tySmooth = targetOffset.y;
-                tzSmooth = targetOffset.z;
+                txSmooth = realTarget.x;
+                tySmooth = realTarget.y;
+                tzSmooth = realTarget.z;
             }
 
             transform.localRotation = Quaternion.Euler(ySmooth, xSmooth, 0);
