@@ -28,7 +28,7 @@ public class KOctreeK1 : OSCControllable {
     public bool bodyOnly;
     [OSCProperty("autoBodyOnly")]
     public bool autoBodyOnly;
-    public static realBodyOnly;
+    public static bool realBodyOnly;
 
     [OSCProperty("textureSpeed")]
     public float texSpeed = 0;
