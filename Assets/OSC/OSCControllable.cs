@@ -45,7 +45,7 @@ public class OSCControllable : MonoBehaviour {
 
         string typeString = info.FieldType.ToString();
 
-        Debug.Log("OSC IN TYPE : " + typeString +" " + values[0].ToString());
+        //Debug.Log("OSC IN TYPE : " + typeString +" " + values[0].ToString());
 
         // if we detect any attribute print out the data.
 
