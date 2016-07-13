@@ -8,4 +8,6 @@
 - comment modifier tous les matériaux des enfants d'un gameobject ? supprimer ombre et options de rendu par exemple ou changer de matériaux dynamiquement (révéler une texture plus réelle par glitch)
 - shader antialiasing & vignetting suppriment la couche alpha
 - intégration d'animation ? (en keyframe ou pointcloud filmé ????)
--> point cloud à partir de depthmap de realsense
+- point cloud à partir de depthmap de realsense (pour montage dans maya ou intégration en temps réel)
+- traitement mesh pour ascenseur (aplat silhouette ?)
+- si plusieurs body faire des traitements différents sur les différents body (différencier Cécile des assistants)
