@@ -7,3 +7,4 @@
 - max distance du koctree relatif à distance du body
 - comment modifier tous les matériaux des enfants d'un gameobject ? supprimer ombre et options de rendu par exemple ou changer de matériaux dynamiquement (révéler une texture + réelle par glitch)
 - shader antialiasing & vignetting suppriment la couche alpha
+- intégration d'animation ? (en keyframe ou pointcloud filmé ????)
