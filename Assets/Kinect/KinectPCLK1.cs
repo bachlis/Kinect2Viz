@@ -17,11 +17,9 @@ public class KinectPCLK1 : OSCControllable {
     public const int DEPTH_WIDTH = 640;
     public const int DEPTH_HEIGHT = 480;
 
-
     public static KinectPCLK1 instance;
 
     private KinectManager manager;
-
 
     public bool debug;
     public bool debugBodyOnly;
@@ -38,6 +36,7 @@ public class KinectPCLK1 : OSCControllable {
     public List<PCLPoint> roiPoints;
 
     [Range(0, 1)]
+    [OSCProperty("bodyRandom")]
     public float bodyRandomProba;
 
     [HideInInspector]
@@ -48,7 +47,7 @@ public class KinectPCLK1 : OSCControllable {
     [HideInInspector]
     public List<PCLPoint> bodyPoints;
 
-    public Vector3 bodyCenter;
+    public static Vector3 bodyCenter;
 
     [HideInInspector]
     public int numPoints;
@@ -113,9 +112,12 @@ public class KinectPCLK1 : OSCControllable {
     [Range(-5, 5)]
     public float topLimit = 5;
 
-
+    /*
     [OSCProperty("position")]
     public Vector3 pos;
+
+    [OSCProperty("rotation")]
+    public Vector3 rot;//*/
 
     void Awake()
     {
@@ -141,9 +143,10 @@ public class KinectPCLK1 : OSCControllable {
     // Update is called once per frame
     public override void Update()
     {
-        transform.position = pos;
-        
-        if(Input.GetKeyDown(KeyCode.G)) regenerateRandom = !regenerateRandom;
+        //transform.localPosition = pos;
+        //transform.localRotation = Quaternion.Euler(rot);
+
+        if (Input.GetKeyDown(KeyCode.G)) regenerateRandom = !regenerateRandom;
         if (Input.GetKeyDown(KeyCode.H)) regenerateRandom = true;
         if (Input.GetKeyUp(KeyCode.H)) regenerateRandom = false;
 
@@ -175,8 +178,7 @@ public class KinectPCLK1 : OSCControllable {
         bodyPoints.Clear();
         bodyCenter = new Vector3();
 
-
-
+        
         for (int ix = 0; ix < pointsWidth; ix++)
         {
             for (int iy = 0; iy < pointsHeight; iy++)
@@ -287,6 +289,8 @@ public class KinectPCLK1 : OSCControllable {
     {
         Gizmos.DrawWireCube(transform.TransformPoint((rightLimit + leftLimit) / 2, (bottomLimit + topLimit) / 2, (minDepth + maxDepth) / 2),
                             Vector3.Scale(new Vector3(rightLimit - leftLimit, topLimit - bottomLimit, maxDepth - minDepth), transform.localScale));
+        //Gizmos.DrawWireCube(transform.position,
+        //                    Vector3.Scale(new Vector3(rightLimit - leftLimit, topLimit - bottomLimit, maxDepth - minDepth), transform.localScale));
     }
 
 

@@ -26,6 +26,9 @@ public class KOctreeK1 : OSCControllable {
 
     [OSCProperty("bodyOnly")]
     public bool bodyOnly;
+    [OSCProperty("autoBodyOnly")]
+    public bool autoBodyOnly;
+    public static bool realBodyOnly;
 
     [OSCProperty("textureSpeed")]
     public float texSpeed = 0;
@@ -47,13 +50,17 @@ public class KOctreeK1 : OSCControllable {
 
     // Update is called once per frame
     public override void Update () {
-       
+        realBodyOnly = bodyOnly;
     }
 
     void postRender(Camera cam)
     {
-        if (cam != Camera.main) return;
-
+        //if (cam != Camera.main) return;
+        if (autoBodyOnly)
+        {
+            bodyOnly = KinectPCLK1.instance.bodyPoints.Count > 10;
+            realBodyOnly = bodyOnly;
+        }
         List<PCLPoint> tPoints = bodyOnly ? KinectPCLK1.instance.bodyPoints : KinectPCLK1.instance.roiPoints;
         PointOctree<PCLPoint> po = bodyOnly ? KinectPCLK1.instance.bodyTree : KinectPCLK1.instance.roiTree;
 

@@ -1,0 +1,13 @@
+﻿notes video softlove :
+
+- possibilité de basculer entre point cloud basique et mesh complexe pour calibration de l'incrustation du "réel" dans virtuel
+- réglage de l'angle de kinect dynamique ?
+- bascule entre plusieurs kinect ou entrée pointcloud via spout en conservant la fonction bodyonly
+- mémoriser un mesh kinect pour le replacer dans l'espace même quand personne devant kinect
+- max distance du koctree relatif à distance du body
+- comment modifier tous les matériaux des enfants d'un gameobject ? supprimer ombre et options de rendu par exemple ou changer de matériaux dynamiquement (révéler une texture plus réelle par glitch)
+- shader antialiasing & vignetting suppriment la couche alpha
+- intégration d'animation ? (en keyframe ou pointcloud filmé ????)
+- point cloud à partir de depthmap de realsense (pour montage dans maya ou intégration en temps réel)
+- traitement mesh pour ascenseur (aplat silhouette ?)
+- si plusieurs body faire des traitements différents sur les différents body (différencier Cécile des assistants)

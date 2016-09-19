@@ -21,7 +21,7 @@ public class MouseOrbitImproved : OSCControllable
     float yMinLimit = -90;
     float yMaxLimit = 90;
 
-    float distanceMin = 1;
+    float distanceMin = 0.1f;
     float distanceMax = 500;
 
     [OSCProperty("x")]
@@ -29,13 +29,22 @@ public class MouseOrbitImproved : OSCControllable
     [OSCProperty("y")]
     public float y = 0.0f;
 
+    [OSCProperty("smooth")]
     public float smoothTime = 0.2f;
 
     private float xSmooth = 0.0f;
     private float ySmooth = 0.0f;
+    private float distSmooth = 0.0f;
+    private float txSmooth = 0.0f;
+    private float tySmooth = 0.0f;
+    private float tzSmooth = 0.0f;
+
     private float xVelocity = 0.0f;
     private float yVelocity = 0.0f;
-
+    private float distVelocity = 0.0f;
+    private float txVelocity = 0.0f;
+    private float tyVelocity = 0.0f;
+    private float tzVelocity = 0.0f;
     //private FIXME_VAR_TYPE posSmooth= Vector3.zero;
     //private FIXME_VAR_TYPE posVelocity= Vector3.zero;
 
@@ -58,21 +67,29 @@ public class MouseOrbitImproved : OSCControllable
 
             }
 
-            if (Application.isPlaying)
+            distance = Mathf.Clamp(distance - Input.GetAxis("Mouse ScrollWheel") * distance, distanceMin, distanceMax);
+
+            if (Application.isPlaying && smoothTime > 0)
             {
                 xSmooth = Mathf.SmoothDamp(xSmooth, x, ref xVelocity, smoothTime);
                 ySmooth = Mathf.SmoothDamp(ySmooth, y, ref yVelocity, smoothTime);
-            }else
+                distSmooth = Mathf.SmoothDamp(distSmooth, distance, ref distVelocity, smoothTime);
+                txSmooth = Mathf.SmoothDamp(txSmooth, targetOffset.x, ref txVelocity, smoothTime);
+                tySmooth = Mathf.SmoothDamp(tySmooth, targetOffset.y, ref tyVelocity, smoothTime);
+                tzSmooth = Mathf.SmoothDamp(tzSmooth, targetOffset.z, ref tzVelocity, smoothTime);
+            }
+            else
             {
                 xSmooth = x;
                 ySmooth = y;
+                distSmooth = distance;
+                txSmooth = targetOffset.x;
+                tySmooth = targetOffset.y;
+                tzSmooth = targetOffset.z;
             }
 
-            distance = Mathf.Clamp(distance - Input.GetAxis("Mouse ScrollWheel") * distance, distanceMin, distanceMax);
-
-
             transform.localRotation = Quaternion.Euler(ySmooth, xSmooth, 0);
-            transform.position = transform.rotation * new Vector3(0.0f, 0.0f, -distance) + target.position + targetOffset;
+            transform.position = transform.rotation * new Vector3(0.0f, 0.0f, -distSmooth) + target.position + new Vector3(txSmooth, tySmooth, tzSmooth);
 
         }
     }
