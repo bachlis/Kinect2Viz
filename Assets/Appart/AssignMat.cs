@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+
+#if UNITY_EDITOR
 using UnityEditor;
 
 public class AssignMaterial : ScriptableWizard
@@ -38,4 +40,8 @@ public class AssignMaterial : ScriptableWizard
     {
         ScriptableWizard.DisplayWizard<AssignMaterial>("Assign Material", "Assign");
     }
+
+
 }
+
+#endif

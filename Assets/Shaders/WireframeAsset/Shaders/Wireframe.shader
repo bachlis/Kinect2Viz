@@ -1,4 +1,7 @@
-﻿Shader "Wireframe/Wireframe" {
+﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+// Upgrade NOTE: replaced '_World2Object' with 'unity_WorldToObject'
+
+Shader "Wireframe/Wireframe" {
 	Properties 
 	{
 		_WireframeColor ("Wireframe Color",Color) = (0,0,1,1)
@@ -63,8 +66,8 @@
             {
         		GS_INPUT output = (GS_INPUT)0;
 
-				output.pos =  mul(_Object2World, v.vertex);
-				output.normal = mul(_Object2World,v.normal);
+				output.pos =  mul(unity_ObjectToWorld, v.vertex);
+				output.normal = mul(unity_ObjectToWorld,v.normal);
 				
 				//ampl in [0.5;1]
 				output.ampl = float2((dot(  _WorldSpaceCameraPos - output.pos,output.normal)>=0)*_BackFaceAttenuation+(1-_BackFaceAttenuation),0);
@@ -171,7 +174,7 @@
 
 				
 				//Create triangle stream
-				float4x4 vp = mul(UNITY_MATRIX_MVP, _World2Object);
+				float4x4 vp = mul(UNITY_MATRIX_MVP, unity_WorldToObject);
 				FS_INPUT pIn;
 								
 				int idx;
