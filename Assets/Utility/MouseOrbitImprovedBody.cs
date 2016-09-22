@@ -65,20 +65,26 @@ public class MouseOrbitImprovedBody : OSCControllable
 
     void LateUpdate()
     {
-        if (useBody && KinectPCLK1.realBodyOnly)
+
+        if (useBody)
         {
             if (Application.isPlaying && bodySmoothTime > 0)
             {
+                /*
                 bodyPosSmooth.x = Mathf.SmoothDamp(bodyPosSmooth.x, KinectPCLK1.bodyCenter.x + bodyOffset.x, ref bodyPosVelocity.x, bodySmoothTime);
                 bodyPosSmooth.y = Mathf.SmoothDamp(bodyPosSmooth.y, KinectPCLK1.bodyCenter.y + bodyOffset.y, ref bodyPosVelocity.y, bodySmoothTime);
                 bodyPosSmooth.z = Mathf.SmoothDamp(bodyPosSmooth.z, KinectPCLK1.bodyCenter.z + bodyOffset.z, ref bodyPosVelocity.z, bodySmoothTime);
+                */
             }
             else
             {
+                /*
                 bodyPosSmooth.x = KinectPCLK1.bodyCenter.x + bodyOffset.x;
                 bodyPosSmooth.y = KinectPCLK1.bodyCenter.y + bodyOffset.y;
                 bodyPosSmooth.z = KinectPCLK1.bodyCenter.z + bodyOffset.z;
+                */
             }
+
 
             realTarget = targetOffset + bodyPosSmooth;
 
@@ -127,7 +133,10 @@ public class MouseOrbitImprovedBody : OSCControllable
 
     void OnDrawGizmos()
     {
+        Gizmos.color = Color.grey;
+        Gizmos.DrawWireCube(target.transform.position, Vector3.one * 1f);
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireCube(target.transform.position+targetOffset, Vector3.one * 1f);
+        Gizmos.DrawWireCube(target.transform.position+targetOffset, Vector3.one * .2f);
+        
     }
 }

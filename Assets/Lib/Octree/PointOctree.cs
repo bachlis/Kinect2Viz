@@ -79,24 +79,33 @@ public class PointOctree<T> where T : class {
 		return removed;
 	}
 
-	/// <summary>
-	/// Return objects that are within maxDistance of the specified ray.
-	/// If none, returns an empty array (not null).
-	/// </summary>
-	/// <param name="ray">The ray. Passing as ref to improve performance since it won't have to be copied.</param>
-	/// <param name="maxDistance">Maximum distance from the ray to consider.</param>
-	/// <returns>Objects within range.</returns>
-	public T[] GetNearby(Ray ray, float maxDistance) {
-		List<T> collidingWith = new List<T>();
-		rootNode.GetNearby(ref ray, ref maxDistance, collidingWith);
-		return collidingWith.ToArray();
-	}
+    /// <summary>
+    /// Return objects that are within maxDistance of the specified ray.
+    /// If none, returns an empty array (not null).
+    /// </summary>
+    /// <param name="ray">The ray. Passing as ref to improve performance since it won't have to be copied.</param>
+    /// <param name="maxDistance">Maximum distance from the ray to consider.</param>
+    /// <returns>Objects within range.</returns>
+    public T[] GetNearby(Ray ray, float maxDistance)
+    {
+        List<T> collidingWith = new List<T>();
+        rootNode.GetNearby(ref ray, ref maxDistance, collidingWith);
+        return collidingWith.ToArray();
+    }
 
-	/// <summary>
-	/// Draws node boundaries visually for debugging.
-	/// Must be called from OnDrawGizmos externally. See also: DrawAllObjects.
-	/// </summary>
-	public void DrawAllBounds() {
+
+    public T[] GetNearbyAndPositive(Vector3 pos, float maxDistance)
+    {
+        List<T> collidingWith = new List<T>();
+        rootNode.GetNearbyAndPositive(ref pos, ref maxDistance, collidingWith);
+        return collidingWith.ToArray();
+    }
+
+    /// <summary>
+    /// Draws node boundaries visually for debugging.
+    /// Must be called from OnDrawGizmos externally. See also: DrawAllObjects.
+    /// </summary>
+    public void DrawAllBounds() {
 		rootNode.DrawAllBounds();
 	}
 

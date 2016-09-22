@@ -122,11 +122,44 @@ public class PointOctreeNode<T> where T : class {
 		}
 	}
 
-	/// <summary>
-	/// Set the 8 children of this octree.
-	/// </summary>
-	/// <param name="childOctrees">The 8 new child nodes.</param>
-	public void SetChildren(PointOctreeNode<T>[] childOctrees) {
+    public void GetNearbyAndPositive(ref Vector3 pos, ref float maxDistance, List<T> result)
+    {
+        // Does the ray hit this node at all?
+        // Note: Expanding the bounds is not exactly the same as a real distance check, but it's fast.
+        // TODO: Does someone have a fast AND accurate formula to do this check?
+        bounds.Expand(new Vector3(maxDistance * 2, maxDistance * 2, maxDistance * 2));
+        bool intersected = bounds.Contains(pos);
+        bounds.size = actualBoundsSize;
+
+        if (!intersected)
+        {
+            return;
+        }
+
+        // Check against any objects in this node
+        for (int i = 0; i < objects.Count; i++)
+        {
+            if (Vector3.Distance(pos, objects[i].Pos) <= maxDistance && pos.x > objects[i].Pos.x)
+            {
+                result.Add(objects[i].Obj);
+            }
+        }
+
+        // Check children
+        if (children != null)
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                children[i].GetNearbyAndPositive(ref pos, ref maxDistance, result);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Set the 8 children of this octree.
+    /// </summary>
+    /// <param name="childOctrees">The 8 new child nodes.</param>
+    public void SetChildren(PointOctreeNode<T>[] childOctrees) {
 		if (childOctrees.Length != 8) {
 			Debug.LogError("Child octree array must be length 8. Was length: " + childOctrees.Length);
 			return;
@@ -423,4 +456,5 @@ public class PointOctreeNode<T> where T : class {
 	public static float DistanceToRay(Ray ray, Vector3 point) {
 		return Vector3.Cross(ray.direction, point - ray.origin).magnitude;
 	}
+
 }

@@ -94,7 +94,7 @@ public class MouseOrbitImproved : OSCControllable
         }
     }
 
-    void OnDrawGizmos()
+    void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireCube(target.transform.position+targetOffset, Vector3.one * 1f);

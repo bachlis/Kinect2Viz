@@ -43,13 +43,13 @@ ModelImporter:
     4300010: Mesh6_Group7_Group1_N_on__le_tabouret_Maisons_du_mo_L__nde__R_f__115_839_Prix__69_euros1_Model
     4300012: Mesh7_Group_2_1_Group8_Group1_N_on__le_tabouret_Maisons_du_mo_L__nde__R_f__115_839_Prix__69_euros1_Model
   materials:
-    importMaterials: 1
+    importMaterials: 0
     materialName: 0
     materialSearch: 1
   animations:
     legacyGenerateAnimations: 4
     bakeSimulation: 0
-    resampleRotations: 1
+    resampleCurves: 1
     optimizeGameObjects: 0
     motionNodeName: 
     animationImportErrors: 
@@ -71,10 +71,10 @@ ModelImporter:
     addColliders: 0
     importBlendShapes: 1
     swapUVChannels: 0
-    generateSecondaryUV: 0
+    generateSecondaryUV: 1
     useFileUnits: 1
     optimizeMeshForGPU: 1
-    keepQuads: 0
+    keepQuads: 1
     weldVertices: 1
     secondaryUVAngleDistortion: 8
     secondaryUVAreaDistortion: 15.000001
@@ -82,8 +82,8 @@ ModelImporter:
     secondaryUVPackMargin: 4
     useFileScale: 1
   tangentSpace:
-    normalSmoothAngle: 60
-    normalImportMode: 0
+    normalSmoothAngle: 22
+    normalImportMode: 1
     tangentImportMode: 3
   importAnimation: 1
   copyAvatar: 0
