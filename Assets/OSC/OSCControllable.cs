@@ -9,11 +9,13 @@ public class OSCControllable : MonoBehaviour {
 
     public string oscName;
     public List<KeyValuePair<string,FieldInfo>> oscProperties;
+    public List<KeyValuePair<string, MethodInfo>> oscMethods;
 
     void init()
     {
+        //PROPERTIES
         oscProperties = new List<KeyValuePair<string, FieldInfo>>();
-
+        
         Type t = GetType();
         FieldInfo[] objectFields = t.GetFields(BindingFlags.Instance | BindingFlags.Public);
 
@@ -27,29 +29,57 @@ public class OSCControllable : MonoBehaviour {
                 oscProperties.Add(new KeyValuePair<string, FieldInfo>(attribute.address,info));
             }
         }
+
+        //METHODS
+
+        oscMethods = new List<KeyValuePair<string, MethodInfo>>();
+
+        MethodInfo[] methodFields = t.GetMethods(BindingFlags.Instance | BindingFlags.Public);
+
+        for (int i = 0; i < objectFields.Length; i++)
+        {
+            MethodInfo info = methodFields[i];
+            OSCMethod attribute = Attribute.GetCustomAttribute(info, typeof(OSCMethod)) as OSCMethod;
+
+            if (attribute != null)
+            {
+                oscMethods.Add(new KeyValuePair<string, MethodInfo>(attribute.address, info));
+            }
+        }
     }
 
 
 
     public void setProp(string property, List<object> values)
     {
-        if (oscProperties == null) init();
+        if (oscProperties == null || oscMethods == null) init();
 
         FieldInfo info = getPropInfoForAddress(property);
-
-        if (info == null)
+        if (info != null)
         {
-            Debug.Log("not found : " + property);
+            setFieldProp(info, property, values);
             return;
         }
 
+        MethodInfo mInfo = getMethodInfoForAddress(property);
+        if (mInfo != null)
+        {
+            setMethodProp(mInfo, property, values);
+            return;
+        }
+    }
+
+
+
+   public void setFieldProp(FieldInfo info, string property, List<object> values)
+   { 
         string typeString = info.FieldType.ToString();
 
         //Debug.Log("OSC IN TYPE : " + typeString +" " + values[0].ToString());
 
         // if we detect any attribute print out the data.
 
-                if (typeString == "System.Single")
+        if (typeString == "System.Single")
         {
             if(values.Count >= 1) info.SetValue(this, getFloat(values[0]));
         }else if(typeString == "System.Boolean")
@@ -77,6 +107,89 @@ public class OSCControllable : MonoBehaviour {
            // Debug.Log("String received : " + values.ToString());
             info.SetValue(this, values[0].ToString());
         }
+    }
+
+
+
+
+    public void setMethodProp(MethodInfo info, string property, List<object> values)
+    {
+
+        object[] parameters = new object[info.GetParameters().Length];
+
+        Debug.Log("num parameters : " + parameters.Length);
+        int valueIndex = 0;
+        for(int i=0;i<parameters.Length;i++)
+        {
+            string typeString = info.GetParameters()[i].ParameterType.ToString();
+            Debug.Log("OSC IN Method, arg "+i+" TYPE : " + typeString + ", num values in OSC Message " + values.Count);
+            
+            if (typeString == "System.Single")
+            {
+                if (values.Count >= valueIndex + 1)
+                {
+                    parameters[i] = getFloat(values[i]);
+                    valueIndex += 1;
+                }
+            }
+            else if (typeString == "System.Boolean")
+            {
+                if (values.Count >= valueIndex + 1)
+                {
+                    parameters[i] = getBool(values[i]);
+                    valueIndex += 1;
+                }
+            }
+            else if (typeString == "System.Int32")
+            {
+                if (values.Count >= valueIndex + 1)
+                {
+                    parameters[i] = getInt(values[i]);
+                    valueIndex += 1;
+                }
+            }
+            else if (typeString == "UnityEngine.Vector2")
+            {
+                if (values.Count >= valueIndex + 2)
+                {
+                    parameters[i] = new Vector2(getFloat(values[valueIndex]), getFloat(values[i+1]));
+                    valueIndex += 2;
+                }
+            }
+            else if (typeString == "UnityEngine.Vector3")
+            {
+                if (values.Count >= valueIndex + 3)
+                {
+                    parameters[i] = new Vector3(getFloat(values[valueIndex]), getFloat(values[valueIndex + 1]), getFloat(values[valueIndex + 2]));
+                    valueIndex += 3;
+                }
+            }
+            else if (typeString == "UnityEngine.Color")
+            {
+                if (values.Count >= valueIndex + 4)
+                {
+                    parameters[i] = new Color(getFloat(values[valueIndex + 0]), getFloat(values[valueIndex + 1]), getFloat(values[valueIndex + 2]), getFloat(values[valueIndex + 3]));
+                    valueIndex += 4;
+                }
+                else if (values.Count >= i + 3)
+                {
+                    parameters[i] = new Color(getFloat(values[valueIndex + 0]), getFloat(values[valueIndex + 1]), getFloat(values[valueIndex + 2]), 1);
+                    valueIndex += 3;
+                }
+
+            }
+            else if (typeString == "System.String")
+            {
+                if (values.Count >= valueIndex + 1)
+                {
+                    parameters[i] = values[i].ToString();
+                    valueIndex += 1;
+                }
+            }
+
+        }
+
+        info.Invoke(this, parameters);
     }
 
 
@@ -120,6 +233,19 @@ public class OSCControllable : MonoBehaviour {
             if(p.Key == address)
             {
                 return p.Value; 
+            }
+        }
+
+        return null;
+    }
+
+    public MethodInfo getMethodInfoForAddress(string address)
+    {
+        foreach (KeyValuePair<string, MethodInfo> p in oscMethods)
+        {
+            if (p.Key == address)
+            {
+                return p.Value;
             }
         }
 

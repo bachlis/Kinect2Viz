@@ -97,15 +97,16 @@ public class PCLKuku : OSCControllable
 
         for (int i = 0; i < handler.numGoodPoints; i++)
         {
-            
-            Vector3 realPos = transform.TransformPoint(handler.points[i]);
+
+            int pIndex = handler.goodPointIndices[i];
+            Vector3 realPos = transform.TransformPoint(handler.points[pIndex]);
 
             if (shuffleRandom)
             {
-                randomVectors[handler.positions[i]] = UnityEngine.Random.insideUnitSphere;
+                randomVectors[pIndex] = UnityEngine.Random.insideUnitSphere;
             }
             
-            realPos += randomVectors[handler.positions[i]]*randomFactor;
+            realPos += randomVectors[pIndex] *randomFactor;
 
             if(handler.numBodiesTracked == 0)
             {

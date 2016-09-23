@@ -1,20 +1,26 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PCLSkeleton : MonoBehaviour {
+public class PCLSkeleton : OSCControllable {
 
     public bool debugJoints;
     PCLHandler handler;
 	// Use this for initialization
-	void Start () {
+	public override void Start () {
         
         handler = GetComponent<PCLHandler>();
 	}
-	 
-	// Update is called once per frame
-	void Update () {
+
+    // Update is called once per frame
+    public override void Update () {
 	
 	}
+
+    [OSCMethod("showText")]
+    public void showText(string text, int skelIndex)
+    {
+        Debug.Log("Show text :" + text + " at " + skelIndex);
+    }
 
     void OnDrawGizmos() 
     {

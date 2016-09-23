@@ -8,6 +8,7 @@ using System.Collections;
 public class MouseOrbitImprovedBody : OSCControllable
 {
     public Transform target;
+    public Transform bodyTarget;
 
     [OSCProperty("target")]
     public Vector3 targetOffset;
@@ -49,15 +50,20 @@ public class MouseOrbitImprovedBody : OSCControllable
     //private FIXME_VAR_TYPE posSmooth= Vector3.zero;
     //private FIXME_VAR_TYPE posVelocity= Vector3.zero;
 
-    [OSCProperty("usebody")]
+    [OSCProperty("useBody")]
     public bool useBody;
+
+    [OSCProperty("lookAtBodyFactor")]
+    public float lookAtBodyFactor;
+
     [OSCProperty("bodySmooth")]
     public float bodySmoothTime = 0.2f;
+
     [OSCProperty("bodyOffset")]
     public Vector3 bodyOffset;
     private Vector3 bodyPosSmooth;
     private Vector3 bodyPosVelocity;
-
+    
 
     public override void Start()
     {
@@ -66,27 +72,27 @@ public class MouseOrbitImprovedBody : OSCControllable
     void LateUpdate()
     {
 
-        if (useBody)
+        if (Application.isPlaying && bodySmoothTime > 0)
         {
-            if (Application.isPlaying && bodySmoothTime > 0)
-            {
-                /*
-                bodyPosSmooth.x = Mathf.SmoothDamp(bodyPosSmooth.x, KinectPCLK1.bodyCenter.x + bodyOffset.x, ref bodyPosVelocity.x, bodySmoothTime);
-                bodyPosSmooth.y = Mathf.SmoothDamp(bodyPosSmooth.y, KinectPCLK1.bodyCenter.y + bodyOffset.y, ref bodyPosVelocity.y, bodySmoothTime);
-                bodyPosSmooth.z = Mathf.SmoothDamp(bodyPosSmooth.z, KinectPCLK1.bodyCenter.z + bodyOffset.z, ref bodyPosVelocity.z, bodySmoothTime);
-                */
-            }
-            else
-            {
-                /*
-                bodyPosSmooth.x = KinectPCLK1.bodyCenter.x + bodyOffset.x;
-                bodyPosSmooth.y = KinectPCLK1.bodyCenter.y + bodyOffset.y;
-                bodyPosSmooth.z = KinectPCLK1.bodyCenter.z + bodyOffset.z;
-                */
-            }
 
+            bodyPosSmooth.x = Mathf.SmoothDamp(bodyPosSmooth.x, bodyTarget.position.x + bodyOffset.x, ref bodyPosVelocity.x, bodySmoothTime);
+            bodyPosSmooth.y = Mathf.SmoothDamp(bodyPosSmooth.y, bodyTarget.position.y + bodyOffset.y, ref bodyPosVelocity.y, bodySmoothTime);
+            bodyPosSmooth.z = Mathf.SmoothDamp(bodyPosSmooth.z, bodyTarget.position.z + bodyOffset.z, ref bodyPosVelocity.z, bodySmoothTime);
 
-            realTarget = targetOffset + bodyPosSmooth;
+        }
+        else
+        {
+
+            bodyPosSmooth.x = bodyTarget.position.x + bodyOffset.x;
+            bodyPosSmooth.y = bodyTarget.position.y + bodyOffset.y;
+            bodyPosSmooth.z = bodyTarget.position.z + bodyOffset.z;
+
+        }
+
+        if(useBody)
+        { 
+
+            realTarget = bodyPosSmooth + targetOffset;
 
         } else {
             realTarget = targetOffset;
@@ -125,9 +131,18 @@ public class MouseOrbitImprovedBody : OSCControllable
                 tzSmooth = realTarget.z;
             }
 
-            transform.localRotation = Quaternion.Euler(ySmooth, xSmooth, 0);
-            transform.position = transform.rotation * new Vector3(0.0f, 0.0f, -distSmooth) + target.position + new Vector3(txSmooth, tySmooth, tzSmooth);
+            Vector3 finalCenterPos = realTarget;
+            //if (useBody) finalCenterPos += new Vector3(txSmooth, tySmooth, tzSmooth);
 
+            Vector3 diffPos = (bodyPosSmooth+targetOffset)-finalCenterPos;
+
+            Quaternion bodyLook = Quaternion.LookRotation(diffPos);
+            Quaternion centerRot = Quaternion.Euler(ySmooth, xSmooth, 0);
+            Quaternion finalRot = Quaternion.Lerp(centerRot, bodyLook, lookAtBodyFactor);
+            
+
+            transform.position = centerRot * new Vector3(0.0f, 0.0f, -distSmooth) + finalCenterPos;
+            transform.rotation = Quaternion.Lerp(centerRot, bodyLook, lookAtBodyFactor);
         }
     }
 
@@ -136,7 +151,6 @@ public class MouseOrbitImprovedBody : OSCControllable
         Gizmos.color = Color.grey;
         Gizmos.DrawWireCube(target.transform.position, Vector3.one * 1f);
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireCube(target.transform.position+targetOffset, Vector3.one * .2f);
-        
+        Gizmos.DrawWireCube(realTarget, Vector3.one * .2f);
     }
 }

@@ -4,20 +4,23 @@ using System.Collections.Generic;
 
 public class PCLHandler : MonoBehaviour {
 
-   
+
     public enum DataTarget { Kinect1_1, Kinect1_2, Kinect1_3, Kinect2, RealSense };
     public DataTarget dataTarget;
-    
+
     PCLDataReceiver receiver;
 
     public Vector3[] points { get; private set; }
-    public int[] positions { get; private set; }
-    public Vector3[] quads { get; private set; }
-    public Vector2[] uvs { get; private set; }
+    public int[] goodPointIndices { get; private set; }
+    public int[] quadIndices { get; private set; }
     public int numQuads;
 
     public int numGoodPoints;
+
     public int numTotalPoints;
+    public int pclWidth {get; private set;}
+    public int pclHeight { get; private set; }
+
     public Vector3 pclCenter;
     public int numBodiesTracked;
 
@@ -68,31 +71,37 @@ public class PCLHandler : MonoBehaviour {
         {
             case DataTarget.Kinect1_1:
                 points = receiver.data.k1Clouds[0].points;
-                positions = receiver.data.k1Clouds[0].positions;
+                goodPointIndices = receiver.data.k1Clouds[0].goodPointIndices;
                 numGoodPoints = receiver.data.k1Clouds[0].numGoodPoints;
                 numTotalPoints = PCLConstants.NUM_K1_PIXELS;
                 pclCenter = receiver.data.k1Clouds[0].pclCenter;
+                pclWidth = PCLConstants.K1_PCL_WIDTH;
+                pclHeight = PCLConstants.K1_PCL_HEIGHT;
                 break;
 
             case DataTarget.Kinect1_2:
                 points = receiver.data.k1Clouds[1].points;
-                positions = receiver.data.k1Clouds[1].positions;
+                goodPointIndices = receiver.data.k1Clouds[1].goodPointIndices;
                 numGoodPoints = receiver.data.k1Clouds[1].numGoodPoints;
                 numTotalPoints = PCLConstants.NUM_K1_PIXELS;
                 pclCenter = receiver.data.k1Clouds[1].pclCenter;
+                pclWidth = PCLConstants.K1_PCL_WIDTH;
+                pclHeight = PCLConstants.K1_PCL_HEIGHT;
                 break;
 
             case DataTarget.Kinect1_3:
                 points = receiver.data.k1Clouds[2].points;
-                positions = receiver.data.k1Clouds[2].positions;
+                goodPointIndices = receiver.data.k1Clouds[2].goodPointIndices;
                 numGoodPoints = receiver.data.k1Clouds[2].numGoodPoints;
                 numTotalPoints = PCLConstants.NUM_K1_PIXELS;
                 pclCenter = receiver.data.k1Clouds[2].pclCenter;
+                pclWidth = PCLConstants.K1_PCL_WIDTH;
+                pclHeight = PCLConstants.K1_PCL_HEIGHT;
                 break;
 
             case DataTarget.Kinect2:
                 points = receiver.data.k2Cloud.points;
-                positions = receiver.data.k2Cloud.positions;
+                goodPointIndices = receiver.data.k2Cloud.goodPointIndices;
                 numGoodPoints = receiver.data.k2Cloud.numGoodPoints;
                 numTotalPoints = PCLConstants.NUM_K2_PIXELS;
                 pclCenter = transform.TransformPoint(receiver.data.k2Cloud.pclCenter);
@@ -104,17 +113,20 @@ public class PCLHandler : MonoBehaviour {
                 leftHandPos = receiver.data.k2Cloud.leftHandPos;
                 rightHandPos = receiver.data.k2Cloud.rightHandPos;
 
-                quads = (Vector3[])receiver.data.k2Cloud.quads.Clone();
-                uvs = (Vector2[])receiver.data.k2Cloud.uvs.Clone();
+                quadIndices = receiver.data.k2Cloud.quadIndices;
                 numQuads = receiver.data.k2Cloud.numQuads;
+                pclWidth = PCLConstants.K2_PCL_WIDTH;
+                pclHeight = PCLConstants.K2_PCL_HEIGHT;
                 break;
 
             case DataTarget.RealSense:
                 points = receiver.data.rsCloud.points;
-                positions = receiver.data.rsCloud.positions;
+                goodPointIndices = receiver.data.rsCloud.goodPointIndices;
                 numGoodPoints = receiver.data.rsCloud.numGoodPoints;
                 numTotalPoints = PCLConstants.NUM_RS_PIXELS;
                 pclCenter = receiver.data.rsCloud.pclCenter;
+                pclWidth = PCLConstants.RS_PCL_WIDTH;
+                pclHeight = PCLConstants.RS_PCL_HEIGHT;
                 break;
         }
 
