@@ -24,6 +24,7 @@ static class PCLConstants
 public struct RSCloud
 {
     public int numGoodPoints;
+    public Vector3 pclCenter;
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = PCLConstants.NUM_RS_PIXELS)]
     public Vector3[] points;
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = PCLConstants.NUM_RS_PIXELS)]
@@ -33,6 +34,7 @@ public struct RSCloud
 public struct K1Cloud
 {
     public int numGoodPoints;
+    public Vector3 pclCenter;
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = PCLConstants.NUM_K1_PIXELS)]
     public Vector3[] points;
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = PCLConstants.NUM_K1_PIXELS)]
@@ -42,10 +44,25 @@ public struct K1Cloud
 public struct K2Cloud
 {
     public int numGoodPoints;
+    public Vector3 pclCenter;
+    public int numBodiesTracked;
+
+    public Vector3 headPos;
+    public Vector3 leftHandPos;
+    public Vector3 rightHandPos;
+    public Vector3 neckPos;
+    public Vector3 torsoPos;
+
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = PCLConstants.NUM_K2_PIXELS)]
     public Vector3[] points;
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = PCLConstants.NUM_K2_PIXELS)]
     public int[] positions;
+
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = PCLConstants.NUM_K2_PIXELS * 4)]
+    public Vector3[] quads;
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = PCLConstants.NUM_K2_PIXELS * 4)]
+    public Vector2[] uvs;
+    public int numQuads;
 
 };
 
@@ -53,6 +70,8 @@ public struct K2Cloud
 [StructLayout(LayoutKind.Sequential)]
 public class PCLData
 {
+    public byte isReady;
+
     [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.Struct, SizeConst = PCLConstants.NUM_KINECTS1)]
     public K1Cloud[] k1Clouds;
     public K2Cloud k2Cloud;

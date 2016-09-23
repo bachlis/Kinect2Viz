@@ -8,7 +8,7 @@ public class PCLKuku : OSCControllable
 {
 
     PCLHandler handler;
-    public Collider roiCollider;
+    public BoxCollider roiCollider;
 
     [OSCProperty("active")]
     public bool processLines;
@@ -16,6 +16,7 @@ public class PCLKuku : OSCControllable
     public bool drawLines;
     public bool debugBounds;
     public bool debugObjects;
+    
     public bool gameCams;
     public bool sceneCam;
 
@@ -106,7 +107,10 @@ public class PCLKuku : OSCControllable
             
             realPos += randomVectors[handler.positions[i]]*randomFactor;
 
-            if (roiCollider.bounds.Contains(realPos))
+            if(handler.numBodiesTracked == 0)
+            {
+                if (PointInOABB(realPos, roiCollider))  roiPoints.Add(realPos);
+            }else
             {
                 roiPoints.Add(realPos);
             }
@@ -177,5 +181,21 @@ public class PCLKuku : OSCControllable
         GL.End();
         GL.PopMatrix();
 
+    }
+
+
+    bool PointInOABB(Vector3 point, BoxCollider box)
+    {
+        point = box.transform.InverseTransformPoint(point) - box.center;
+
+        float halfX = (box.size.x * 0.5f);
+        float halfY = (box.size.y * 0.5f);
+        float halfZ = (box.size.z * 0.5f);
+        if (point.x < halfX && point.x > -halfX &&
+           point.y < halfY && point.y > -halfY &&
+           point.z < halfZ && point.z > -halfZ)
+            return true;
+        else
+            return false;
     }
 }
