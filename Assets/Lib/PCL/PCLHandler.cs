@@ -2,9 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 
-[RequireComponent(typeof(MeshRenderer))]
-[RequireComponent(typeof(MeshFilter))]
-[RequireComponent(typeof(Collider))]
 public class PCLHandler : MonoBehaviour {
 
    
@@ -15,6 +12,10 @@ public class PCLHandler : MonoBehaviour {
 
     public Vector3[] points { get; private set; }
     public int[] positions { get; private set; }
+    public Vector3[] quads { get; private set; }
+    public Vector2[] uvs { get; private set; }
+    public int numQuads;
+
     public int numGoodPoints;
     public int numTotalPoints;
     public Vector3 pclCenter;
@@ -55,11 +56,14 @@ public class PCLHandler : MonoBehaviour {
         }
 
         numBodiesTracked = 0;
+        numQuads = 0;
     }
 
     // Update is called once per frame
     void Update () {
         if (receiver.data.k1Clouds == null) return;
+        if (receiver.data.isReady == 0) return;
+
         switch (dataTarget)
         {
             case DataTarget.Kinect1_1:
@@ -99,6 +103,10 @@ public class PCLHandler : MonoBehaviour {
                 torsoPos = receiver.data.k2Cloud.torsoPos;
                 leftHandPos = receiver.data.k2Cloud.leftHandPos;
                 rightHandPos = receiver.data.k2Cloud.rightHandPos;
+
+                quads = (Vector3[])receiver.data.k2Cloud.quads.Clone();
+                uvs = (Vector2[])receiver.data.k2Cloud.uvs.Clone();
+                numQuads = receiver.data.k2Cloud.numQuads;
                 break;
 
             case DataTarget.RealSense:

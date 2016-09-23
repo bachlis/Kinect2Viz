@@ -73,8 +73,6 @@ public class MemoryMapManager : MonoBehaviour{
         
         IntPtr rawDataPtr = Native.Invoke<IntPtr, getMemoryData_C>(nativeLibraryPtr);
         Marshal.PtrToStructure(rawDataPtr, data);
-
-        
     }
 
     void OnApplicationQuit()

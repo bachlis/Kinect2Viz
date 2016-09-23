@@ -58,12 +58,20 @@ public struct K2Cloud
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = PCLConstants.NUM_K2_PIXELS)]
     public int[] positions;
 
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = PCLConstants.NUM_K2_PIXELS * 4)]
+    public Vector3[] quads;
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = PCLConstants.NUM_K2_PIXELS * 4)]
+    public Vector2[] uvs;
+    public int numQuads;
+
 };
 
 
 [StructLayout(LayoutKind.Sequential)]
 public class PCLData
 {
+    public byte isReady;
+
     [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.Struct, SizeConst = PCLConstants.NUM_KINECTS1)]
     public K1Cloud[] k1Clouds;
     public K2Cloud k2Cloud;
