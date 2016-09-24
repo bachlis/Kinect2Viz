@@ -117,18 +117,18 @@ public class OSCControllable : MonoBehaviour {
 
         object[] parameters = new object[info.GetParameters().Length];
 
-        Debug.Log("num parameters : " + parameters.Length);
+        //Debug.Log("Set Method, num expected parameters : " + parameters.Length);
         int valueIndex = 0;
         for(int i=0;i<parameters.Length;i++)
         {
             string typeString = info.GetParameters()[i].ParameterType.ToString();
-            Debug.Log("OSC IN Method, arg "+i+" TYPE : " + typeString + ", num values in OSC Message " + values.Count);
+            //Debug.Log("OSC IN Method, arg "+i+" TYPE : " + typeString + ", num values in OSC Message " + values.Count);
             
             if (typeString == "System.Single")
             {
                 if (values.Count >= valueIndex + 1)
                 {
-                    parameters[i] = getFloat(values[i]);
+                    parameters[i] = getFloat(values[valueIndex]);
                     valueIndex += 1;
                 }
             }
@@ -136,7 +136,7 @@ public class OSCControllable : MonoBehaviour {
             {
                 if (values.Count >= valueIndex + 1)
                 {
-                    parameters[i] = getBool(values[i]);
+                    parameters[i] = getBool(values[valueIndex]);
                     valueIndex += 1;
                 }
             }
@@ -144,7 +144,7 @@ public class OSCControllable : MonoBehaviour {
             {
                 if (values.Count >= valueIndex + 1)
                 {
-                    parameters[i] = getInt(values[i]);
+                    parameters[i] = getInt(values[valueIndex]);
                     valueIndex += 1;
                 }
             }
@@ -152,7 +152,7 @@ public class OSCControllable : MonoBehaviour {
             {
                 if (values.Count >= valueIndex + 2)
                 {
-                    parameters[i] = new Vector2(getFloat(values[valueIndex]), getFloat(values[i+1]));
+                    parameters[i] = new Vector2(getFloat(values[valueIndex]), getFloat(values[valueIndex + 1]));
                     valueIndex += 2;
                 }
             }

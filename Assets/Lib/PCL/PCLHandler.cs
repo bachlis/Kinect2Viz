@@ -65,7 +65,7 @@ public class PCLHandler : MonoBehaviour {
     // Update is called once per frame
     void Update () {
         if (receiver.data.k1Clouds == null) return;
-        if (receiver.data.isReady == 0) return;
+        //if (receiver.data.isReady == 0) return;
 
         switch (dataTarget)
         {

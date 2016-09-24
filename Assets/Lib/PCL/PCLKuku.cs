@@ -31,6 +31,8 @@ public class PCLKuku : OSCControllable
     [OSCProperty("farColor")]
     public Color farColor;
     [Range(0, 5)]
+    [OSCProperty("textureOffset")]
+    public float texOffset = 0;
     [OSCProperty("textureSpeed")]
     public float texSpeed = 0;
     [Range(-2, 2)]
@@ -151,7 +153,7 @@ public class PCLKuku : OSCControllable
         if (cam.cameraType == CameraType.Game && !gameCams) camCheck = false;
         if(cam.cameraType == CameraType.SceneView && !sceneCam) camCheck = false;
         if (!camCheck) return;
-
+        if (links == null) return;
 
 
         lineMat.SetPass(0);
@@ -159,7 +161,7 @@ public class PCLKuku : OSCControllable
         //GL.MultMatrix(Matrix4x4.TRS(transform.position, transform.rotation, transform.lossyScale));
         GL.Begin(GL.LINES);
 
-
+        
         foreach (KukuLink kl in links)
         {
             //if (Vector3.Distance(np, p) > maxDistance) continue;
@@ -169,7 +171,7 @@ public class PCLKuku : OSCControllable
                 float lerpDist = alphaDecay.Evaluate(kl.distance / maxDistance);
                 GL.Color(Color.Lerp(nearColor, farColor, lerpDist));
 
-                float baseU = Time.time * (texSpeed + texSpeedDiff * lerpDist);
+                float baseU = Time.time * (texSpeed + texSpeedDiff * lerpDist) + texOffset;
                 GL.TexCoord(new Vector3(baseU, 0, 0));
                 GL.Vertex(kl.start) ;
 

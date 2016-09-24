@@ -37,6 +37,21 @@ public class MouseDoubleOrbit : OSCControllable {
     Vector3 targetLookAtPos;
     Vector3 targetPosCenter;
 	
+    [OSCMethod("setCamera")]
+    public void setCamera(float x, float y,float distance, Vector3 posOffset, Vector3 lookAtOffset, float posSmooth, float lookAtSmooth, float posLerpFactor, float lookAtLerpFactor)
+    {
+        Debug.Log("Set camera ("+oscName+") :" + x + "," + y + "," + distance);
+        this.posSmooth = posSmooth;
+        this.lookAtSmooth = lookAtSmooth;
+        this.x = x;
+        this.y = y;
+        this.distance = distance;
+        this.posOffset = posOffset;
+        this.lookAtOffset = lookAtOffset;
+        this.posLerpFactor = posLerpFactor;
+        this.lookAtLerpFactor = lookAtLerpFactor;
+    }
+
 	// Update is called once per frame
 	public override void Update () {
         if (t1 == null || t2 == null) return;

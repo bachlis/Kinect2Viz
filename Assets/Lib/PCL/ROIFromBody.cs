@@ -16,7 +16,10 @@ public class ROIFromBody : OSCControllable {
     public float offsetX;
     [OSCProperty("offsetZ")]
     public float offsetZ;
-    
+
+    [OSCProperty("roiSmooth")]
+    public float roiSmooth;
+    Vector3 posVelocity;
 
 	// Update is called once per frame
 	public override void Update () {
@@ -29,7 +32,7 @@ public class ROIFromBody : OSCControllable {
             offsetZ = localPos.z;
         }
 
-        transform.localPosition = new Vector3(offsetX, (yTop + yBottom) / 2, offsetZ);
+        transform.localPosition = Vector3.SmoothDamp(transform.localPosition,new Vector3(offsetX, (yTop + yBottom) / 2, offsetZ),ref posVelocity,roiSmooth);
         transform.localScale = new Vector3(xzSize,  yTop - yBottom, xzSize);
 	}
 }
