@@ -28,7 +28,7 @@ public struct RSCloud
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = PCLConstants.NUM_RS_PIXELS)]
     public Vector3[] points;
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = PCLConstants.NUM_RS_PIXELS)]
-    public int[] positions;
+    public int[] goodPointIndices;
 };
 
 public struct K1Cloud
@@ -38,7 +38,7 @@ public struct K1Cloud
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = PCLConstants.NUM_K1_PIXELS)]
     public Vector3[] points;
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = PCLConstants.NUM_K1_PIXELS)]
-    public int[] positions;
+    public int[] goodPointIndices;
 };
 
 public struct K2Cloud
@@ -56,12 +56,9 @@ public struct K2Cloud
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = PCLConstants.NUM_K2_PIXELS)]
     public Vector3[] points;
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = PCLConstants.NUM_K2_PIXELS)]
-    public int[] positions;
-
+    public int[] goodPointIndices;
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = PCLConstants.NUM_K2_PIXELS * 4)]
-    public Vector3[] quads;
-    [MarshalAs(UnmanagedType.ByValArray, SizeConst = PCLConstants.NUM_K2_PIXELS * 4)]
-    public Vector2[] uvs;
+    public int[] quadIndices;
     public int numQuads;
 
 };

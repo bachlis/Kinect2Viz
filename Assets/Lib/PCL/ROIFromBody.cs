@@ -1,31 +1,35 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ROIFromBody : MonoBehaviour {
+public class ROIFromBody : OSCControllable {
 
     public PCLHandler handler;
+
+    [OSCProperty("yBottom")]
     public float yBottom;
+    [OSCProperty("yTop")]
     public float yTop;
+    [OSCProperty("xzSize")]
     public float xzSize;
 
-    public float targetX;
-    public float targetZ;
+    [OSCProperty("offsetX")]
+    public float offsetX;
+    [OSCProperty("offsetZ")]
+    public float offsetZ;
     
-	// Use this for initialization
-	void Start () {
-	    
-	}
-	
+
 	// Update is called once per frame
-	void Update () {
+	public override void Update () {
+        base.Update();
+
 	    if(handler.numBodiesTracked > 0)
         {
             Vector3 localPos = transform.parent.InverseTransformPoint(handler.pclCenter);
-            targetX = localPos.x;
-            targetZ = localPos.z;
+            offsetX = localPos.x;
+            offsetZ = localPos.z;
         }
 
-        transform.localPosition = new Vector3(targetX, (yTop + yBottom) / 2, targetZ);
+        transform.localPosition = new Vector3(offsetX, (yTop + yBottom) / 2, offsetZ);
         transform.localScale = new Vector3(xzSize,  yTop - yBottom, xzSize);
 	}
 }
