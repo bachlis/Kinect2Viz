@@ -26,11 +26,7 @@ public class PCLHandler : MonoBehaviour {
 
     public bool debugCenter;
 
-    public Vector3 headPos;
-    public Vector3 neckPos;
-    public Vector3 torsoPos;
-    public Vector3 leftHandPos;
-    public Vector3 rightHandPos;
+    public Vector3[] joints;
 
     // Use this for initialization
     void Start () {
@@ -60,6 +56,10 @@ public class PCLHandler : MonoBehaviour {
 
         numBodiesTracked = 0;
         numQuads = 0;
+
+        joints = new Vector3[14];
+        //For debug
+        for (int i = 0; i < joints.Length; i++) joints[i] = Random.insideUnitSphere * 3;
     }
 
     // Update is called once per frame
@@ -107,11 +107,11 @@ public class PCLHandler : MonoBehaviour {
                 pclCenter = transform.TransformPoint(receiver.data.k2Cloud.pclCenter);
                 numBodiesTracked = receiver.data.k2Cloud.numBodiesTracked;
 
-                headPos = receiver.data.k2Cloud.headPos;
-                neckPos = receiver.data.k2Cloud.neckPos;
-                torsoPos = receiver.data.k2Cloud.torsoPos;
-                leftHandPos = receiver.data.k2Cloud.leftHandPos;
-                rightHandPos = receiver.data.k2Cloud.rightHandPos;
+                joints[0] = receiver.data.k2Cloud.headPos;
+                joints[1] = receiver.data.k2Cloud.neckPos;
+                joints[2] = receiver.data.k2Cloud.torsoPos;
+                joints[3] = receiver.data.k2Cloud.leftHandPos;
+                joints[4] = receiver.data.k2Cloud.rightHandPos;
 
                 quadIndices = receiver.data.k2Cloud.quadIndices;
                 numQuads = receiver.data.k2Cloud.numQuads;

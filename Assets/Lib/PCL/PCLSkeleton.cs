@@ -1,26 +1,39 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PCLSkeleton : OSCControllable {
+public class PCLSkeleton : MonoBehaviour {
+
+    public GameObject lineTextPrefab;
 
     public bool debugJoints;
     PCLHandler handler;
+
+    public Vector3[] joints;
+
 	// Use this for initialization
-	public override void Start () {
+	void Start () {
         
         handler = GetComponent<PCLHandler>();
 	}
+	 
 
-    // Update is called once per frame
-    public override void Update () {
-	
-	}
-
-    [OSCMethod("showText")]
-    public void showText(string text, int skelIndex)
+    void showText(string text, float time, int jointIndex, Vector3 dir)
     {
-        Debug.Log("Show text :" + text + " at " + skelIndex);
+        LineText lt = Instantiate(lineTextPrefab).GetComponent<LineText>();
+        lt.setProps(this, text, time, jointIndex, dir);
+        //lt.transform.parent = transform;
+        
     }
+
+	// Update is called once per frame
+	void Update () {
+        joints = handler.joints;
+
+        if(Input.GetMouseButtonDown(0))
+        {
+            showText("Trop de la balle", 1 + Random.value * 4, Random.Range(0, 4), Random.insideUnitSphere*2);
+        }
+	}
 
     void OnDrawGizmos() 
     {
@@ -28,12 +41,12 @@ public class PCLSkeleton : OSCControllable {
         if(debugJoints && handler.numBodiesTracked > 0)
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(transform.TransformPoint(handler.headPos), .05f);
+            Gizmos.DrawWireSphere(transform.TransformPoint(joints[0]), .05f);
             Gizmos.color = Color.cyan;
-            Gizmos.DrawWireSphere(transform.TransformPoint(handler.neckPos), .05f);
-            Gizmos.DrawWireSphere(transform.TransformPoint(handler.torsoPos), .05f);
-            Gizmos.DrawWireSphere(transform.TransformPoint(handler.leftHandPos), .05f);
-            Gizmos.DrawWireSphere(transform.TransformPoint(handler.rightHandPos), .05f);
+            Gizmos.DrawWireSphere(transform.TransformPoint(joints[0]), .05f);
+            Gizmos.DrawWireSphere(transform.TransformPoint(joints[0]), .05f);
+            Gizmos.DrawWireSphere(transform.TransformPoint(joints[0]), .05f);
+            Gizmos.DrawWireSphere(transform.TransformPoint(joints[0]), .05f);
         }
     }
 }
