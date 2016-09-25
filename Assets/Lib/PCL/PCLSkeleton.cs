@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PCLSkeleton : MonoBehaviour {
+public class PCLSkeleton : OSCControllable {
 
     public GameObject lineTextPrefab;
 
@@ -9,29 +9,57 @@ public class PCLSkeleton : MonoBehaviour {
     PCLHandler handler;
 
     public Vector3[] joints;
+    public Transform lookAtTarget;
 
-	// Use this for initialization
-	void Start () {
+    [OSCProperty("circleSize")]
+    [Range(0.01f, 1f)]
+    public float circleSize;
+
+    [OSCProperty("textSmooth")]
+    [Range(0f,1f)]
+    public float textSmooth;
+
+    // Use this for initialization
+    public override void Start () {
         
         handler = GetComponent<PCLHandler>();
 	}
 	 
-
-    void showText(string text, float time, int jointIndex, Vector3 dir)
+    [OSCMethod("showText")]
+    public void showText(string text, float time, int jointIndex, Vector3 dir, float fontSize)
     {
         LineText lt = Instantiate(lineTextPrefab).GetComponent<LineText>();
-        lt.setProps(this, text, time, jointIndex, dir);
+        lt.setProps(this, lookAtTarget, text, time, jointIndex, dir,fontSize,textSmooth,circleSize);
         //lt.transform.parent = transform;
         
     }
 
-	// Update is called once per frame
-	void Update () {
-        joints = handler.joints;
+    [OSCMethod("showTextFixed")]
+    public void showTextFixed(string text, float time, int jointIndex, Vector3 dir, float fontSize, Vector3 pos)
+    {
+        LineText lt = Instantiate(lineTextPrefab).GetComponent<LineText>();
+        lt.setPropsWithFixedPos(pos, lookAtTarget, text, time, jointIndex, dir, fontSize, textSmooth, circleSize);
+        //lt.transform.parent = transform;
 
-        if(Input.GetMouseButtonDown(0))
+    }
+
+    // Update is called once per frame
+    public override void Update () {
+        if(handler.joints != null)
         {
-            showText("Trop de la balle", 1 + Random.value * 4, Random.Range(0, 4), Random.insideUnitSphere*2);
+            if (joints.Length == 0)
+            {
+                joints = new Vector3[handler.joints.Length];
+            }
+            for (int i = 0; i < handler.joints.Length; i++)
+            {
+                joints[i] = transform.TransformPoint(handler.joints[i]);
+            }
+        }
+
+        if(Input.GetMouseButtonDown(1))
+        {
+            showText("Trop de la balle", 2, Random.Range(0, 4), Random.insideUnitSphere*.1f,2f);
         }
 	}
 

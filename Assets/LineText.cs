@@ -17,8 +17,9 @@ public class LineText : MonoBehaviour
     TextMesh tm;
 
     Transform origin;
-
-    private float lineSizeFactor = 5;
+    Transform lookAtTarget;
+    
+    public float lineSizeFactor;
 
     private string text;
 
@@ -27,16 +28,28 @@ public class LineText : MonoBehaviour
     PCLSkeleton skel;
     int jointIndex;
 
+    float posSmooth;
+    Vector3 posVelocity;
+
     void Awake()
     {
         tm = GetComponentInChildren<TextMesh>();
+        
+    }
+    public void setPropsWithFixedPos(Vector3 fixedPos, Transform lookAtTarget, string text, float time, int jointIndex, Vector3 dir, float fontSize, float posSmooth, float circleSize)
+    {
+        transform.position = fixedPos;
+        setProps(null, lookAtTarget, text, time, jointIndex, dir, fontSize, posSmooth, circleSize);
     }
 
-    public void setProps(PCLSkeleton skel, string text, float time, int jointIndex, Vector3 dir)
+    public void setProps(PCLSkeleton skel, Transform lookAtTarget, string text, float time, int jointIndex, Vector3 dir, float fontSize, float posSmooth, float circleSize)
     {
         this.skel = skel;
+        this.lookAtTarget = lookAtTarget;
         this.jointIndex = jointIndex;
         this.text = text;
+        this.posSmooth = posSmooth;
+        
         Invoke("kill", time);
     
         // Create the LineWorks Components and Scriptable Objects.
@@ -45,9 +58,8 @@ public class LineText : MonoBehaviour
         linework.featureMode = FeatureMode.Advanced;
         linework.strokeDrawMode = StrokeDrawMode.Draw3D;
         linework.joinsAndCapsMode = JoinsAndCapsMode.Shader;
-        linework.material.SetFloat("_Width", .3f);
 
-        circle = LW_Circle.Create(Vector2.zero, 3f);
+        circle = LW_Circle.Create(Vector2.zero, .15f / transform.localScale.x);
         circleStroke = LW_Stroke.Create(Color.white, .2f);
         circleStroke.linejoin = Linejoin.Round;
         circle.styles.Add(circleStroke);
@@ -55,8 +67,8 @@ public class LineText : MonoBehaviour
 
         Vector3[] points = new Vector3[3];
         points[0] = Vector3.zero;
-        points[1] = Vector3.Scale(Vector3.one * lineSizeFactor, dir);
-        points[2] = points[1] + Vector3.right * dir.x * lineSizeFactor;
+        points[1] = Vector3.Scale(Vector3.one, dir)/transform.localScale.x;
+        points[2] = points[1] + (Vector3.right * dir.x * lineSizeFactor) / transform.localScale.x;
         line = LW_Polyline3D.Create(points);
         lineStroke = LW_Stroke.Create(Color.white, .2f);
         line.styles.Add(lineStroke);
@@ -66,7 +78,7 @@ public class LineText : MonoBehaviour
         tm.transform.localPosition = points[2];
         tm.anchor = dir.x > 0 ? TextAnchor.LowerRight : TextAnchor.LowerLeft;
         tm.alignment = dir.x > 0 ? TextAlignment.Right : TextAlignment.Left;
-
+        tm.characterSize = fontSize/100;
         text = "Super cool dis-donc";
         
         seq = DOTween.Sequence();
@@ -74,13 +86,13 @@ public class LineText : MonoBehaviour
         //blink circle
         seq.AppendCallback(()=> blinkShape(circle,.5f)).AppendInterval(.3f);
         // reduce circle
-        seq.AppendCallback(reduceCircle).AppendInterval(.2f);
+        seq.AppendCallback(()=>reduceCircle(circleSize/transform.localScale.x)).AppendInterval(.2f);
         //reveal line
         seq.AppendCallback(() => blinkShape(line,.5f)).AppendInterval(.3f);
         seq.AppendCallback(()=>revealText(1));
 
-        transform.position = skel.joints[jointIndex];
-        transform.LookAt(Vector3.Scale(Camera.main.transform.position,new Vector3(-1,-1,-1)));
+        if(skel != null) transform.position = skel.joints[jointIndex];
+        transform.LookAt(lookAtTarget.position);
         
     }
 
@@ -103,9 +115,9 @@ public class LineText : MonoBehaviour
         tm.text = "Hello test";
     }
 
-    void reduceCircle()
+    void reduceCircle(float targetRadius)
     {
-        DOTween.To(() => circle.radius, x => circle.radius = x, .2f, .4f);
+        DOTween.To(() => circle.radius, x => circle.radius = x, targetRadius, .4f);
     }
 
 
@@ -125,10 +137,9 @@ public class LineText : MonoBehaviour
     {
         if (skel != null)
         {
-            Debug.Log(skel.joints[jointIndex]);
-            transform.position = skel.joints[jointIndex];
+            transform.position = Vector3.SmoothDamp(transform.position, skel.joints[jointIndex], ref posVelocity, posSmooth);
         }
 
-        transform.LookAt(Vector3.Scale(Camera.main.transform.position,new Vector3(-1,-1,-1)));
+        transform.LookAt(transform.position*2-lookAtTarget.position);
     }
 }

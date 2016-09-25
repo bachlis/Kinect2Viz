@@ -80,8 +80,9 @@ public class MouseDoubleOrbit : OSCControllable {
         transform.LookAt(targetLookAtPos);
 	}
 
-    void OnDrawGizmos()
+    void OnDrawGizmosSelected()
     {
+
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(t1.position,.2f);
         Gizmos.DrawWireSphere(t2.position, .2f);
