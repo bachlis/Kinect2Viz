@@ -171,7 +171,7 @@ public class KMesh : MonoBehaviour {
         mesh.triangles = triangles;
         mesh.colors = new Color[mesh.vertices.Length];
         mesh.RecalculateBounds();
-        mesh.Optimize();
+        ;
     }
 
 }
