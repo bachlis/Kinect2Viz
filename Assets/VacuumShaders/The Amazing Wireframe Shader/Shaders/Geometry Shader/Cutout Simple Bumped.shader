@@ -1,7 +1,7 @@
 // VacuumShaders 2015
 // https://www.facebook.com/VacuumShaders
 
-Shader "Hidden/VacuumShaders/The Amazing Wireframe/PGeometry Shader/Physically Based/Cutout/Simple/Bumped"
+Shader "Hidden/VacuumShaders/The Amazing Wireframe/Geometry Shader/Physically Based/Cutout/Simple/Bumped"
 {
 	Properties
 	{
@@ -34,15 +34,27 @@ Shader "Hidden/VacuumShaders/The Amazing Wireframe/PGeometry Shader/Physically B
 		[V_WIRE_VertexColor] _V_WIRE_VertexColor("Vertex Color", float) = 0
 
 
-		//Wire Options
-		[V_WIRE_Title] _V_WIRE_Title_W_Options("Wire Visual Options", float) = 0
+		//Wire S Options  
+		[V_WIRE_Title] _V_WIRE_Title_S_Options("Wire Source Options", float) = 0  		
+		
+		//Source
+		[V_WIRE_Source] _V_WIRE_Source_Options ("", float) = 0
+		[HideInInspector] _V_WIRE_SourceTex("", 2D) = "white"{}
+		[HideInInspector] _V_WIRE_SourceTex_Scroll("", vector) = (0, 0, 0, 0)
 
-		[Enum(Screen Space,0,Fixed,1)] _V_WIRE_FixedSize("Size", float) = 0
-		[V_WIRE_PositiveFloat] _V_WIRE_Size("    Value", Float) = 0.5
-		[V_WIRE_HDRColor] _V_WIRE_Color("", color) = (0, 0, 0, 1)
-		_V_WIRE_WireTex("Texture (RGB) Trans (A)", 2D) = "white"{}
+		[HideInInspector] _V_WIRE_FixedSize("", float) = 0
+		[HideInInspector] _V_WIRE_Size("", Float) = 0.5
+
+		//Wire Options  
+		[V_WIRE_Title] _V_WIRE_Title_W_Options("Wire Visual Options", float) = 0  	
+
+		_V_WIRE_Color("Color", color) = (0, 0, 0, 1)
+		_V_WIRE_WireTex("Color Texture (RGBA)", 2D) = "white"{}
 		[V_WIRE_UVScroll] _V_WIRE_WireTex_Scroll("    ", vector) = (0, 0, 0, 0)
 		[Enum(UV0,0,UV1,1)] _V_WIRE_WireTex_UVSet("    UV Set", float) = 0
+
+		//Emission
+		[V_WIRE_PositiveFloat]_V_WIRE_EmissionStrength("Emission Strength", float) = 0
 
 		//Vertex Color
 		[V_WIRE_VertexColor] _V_WIRE_WireVertexColor("Vertex Color", Float) = 0
@@ -332,7 +344,13 @@ Shader "Hidden/VacuumShaders/The Amazing Wireframe/PGeometry Shader/Physically B
 
 	// realtime lighting: call lighting function
 	c += LightingStandard(o, worldViewDir, gi);
-	WireFinalColor(surfIN, o, c);
+	
+	#ifdef V_WIRE_LIGHT_ON
+		c.rgb += o.Emission;
+	#else
+		WireFinalColor(surfIN, o, c);
+	#endif
+
 	UNITY_OPAQUE_ALPHA(c.a);
 	return c;
 	}
@@ -777,6 +795,9 @@ Shader "Hidden/VacuumShaders/The Amazing Wireframe/PGeometry Shader/Physically B
 	ENDCG
 
 	}
+
+	//Shadow
+	UsePass "Hidden/VacuumShaders/The Amazing Wireframe/Geometry Shader/Shadow/Cutout/Full/SHADOWCASTER"
 
 	}
 

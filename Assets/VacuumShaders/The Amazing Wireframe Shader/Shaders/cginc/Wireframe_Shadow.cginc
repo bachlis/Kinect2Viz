@@ -22,14 +22,14 @@
 //Struct    															  //
 //																		  //
 ////////////////////////////////////////////////////////////////////////////
-struct v2f 
+struct v2f_surf
 { 
 	V2F_SHADOW_CASTER;	
 			
 	
 	#ifdef V_WIRE_CUTOUT
 		float4 uv : TEXCOORD1;	
-		half3 mass : TEXCOORD2;	
+		half3 custompack2 : TEXCOORD2;
 
 		float2 data : TEXCOORD3; //x - fadeCoord, y - fixedSizeCoord
 		
@@ -46,9 +46,9 @@ struct v2f
 //Vertex    															  //
 //																		  //
 ////////////////////////////////////////////////////////////z////////////////
-v2f vert( appdata_full v )
+v2f_surf vert( appdata_full v )
 {
-	v2f o = (v2f)0;
+	v2f_surf o = (v2f_surf)0;
 	
 
 //Curved World Compatibility
@@ -62,7 +62,7 @@ v2f vert( appdata_full v )
 		o.uv.zw = TRANSFORM_TEX(((_V_WIRE_WireTex_UVSet == 0) ? v.texcoord.xy : v.texcoord1.xy), _V_WIRE_WireTex);
 		o.uv.zw += _V_WIRE_WireTex_Scroll.xy * _Time.x;
 
-		o.mass = ExtructWireframeFromVertexUV(v.texcoord);
+		o.custompack2 = ExtructWireframeFromVertexUV(v.texcoord);
 
 		o.data.y = distance(_WorldSpaceCameraPos, mul(unity_ObjectToWorld, v.vertex));
 
@@ -84,7 +84,7 @@ v2f vert( appdata_full v )
 //Fragment    															  //
 //																		  //
 ////////////////////////////////////////////////////////////////////////////
-float4 frag( v2f i ) : SV_Target
+float4 frag(v2f_surf i ) : SV_Target
 {
 	#ifdef V_WIRE_CUTOUT
 
@@ -119,7 +119,8 @@ float4 frag( v2f i ) : SV_Target
 			customAlpha = (customAlpha + _V_WIRE_TransparentTex_Alpha_Offset) < 0.01 ? 0 : 1;
 		#endif
 
-		half clipValue = DoWire(1, retColor, i.mass, saturate(i.data.x), i.data.y, dynamicMask, customAlpha, _Cutoff);
+		fixed3 wireEmission = 0;
+		half clipValue = DoWire(1, retColor, i.custompack2, saturate(i.data.x), i.data.y, dynamicMask, customAlpha, _Cutoff, wireEmission);
 
 
 		#ifdef V_WIRE_CUTOUT_HALF

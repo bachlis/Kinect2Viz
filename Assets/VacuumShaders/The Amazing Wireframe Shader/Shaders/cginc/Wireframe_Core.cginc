@@ -12,8 +12,15 @@
   
 
 half4 _V_WIRE_Color;
+half _V_WIRE_EmissionStrength;
 half _V_WIRE_FixedSize;
 half _V_WIRE_Size;
+
+#ifdef V_WIRE_SOURCE_TEXTURE
+	sampler2D _V_WIRE_SourceTex;
+	half4 _V_WIRE_SourceTex_ST;
+	half2 _V_WIRE_SourceTex_Scroll;
+#endif
 
 #ifdef V_WIRE_DYNAMIC_MASK_ON
 	half3 _V_WIRE_DynamicMaskWorldPos;
@@ -49,28 +56,42 @@ float _V_WIRE_DistanceFadeEnd;
 
 
 
-inline fixed3 ExtructWireframeFromVertexUV(half4 uv)
+inline float3 ExtructWireframeFromVertexUV(half4 texcoord)
 {
-	return fixed3(floor(uv.z), frac(uv.z) * 10, uv.w);
+	#ifdef V_WIRE_SOURCE_TEXTURE
+		float3 uv = 0;
+
+		uv.xy = TRANSFORM_TEX(texcoord.xy, _V_WIRE_SourceTex);
+		uv.xy += _V_WIRE_SourceTex_Scroll.xy * _Time.x;
+		uv.z = 0;
+
+		return uv;
+	#else
+		return float3(floor(texcoord.z), frac(texcoord.z) * 10, texcoord.w);
+	#endif
 }
 
 inline half ExtructWireframeFromMass(half3 mass, float fixedSize)
 {
-	float size = lerp(_V_WIRE_Size * 0.1, (_V_WIRE_Size / fixedSize) * 0.01, _V_WIRE_FixedSize);
+	#ifdef V_WIRE_SOURCE_TEXTURE
+		return 1 - tex2D(_V_WIRE_SourceTex, mass.xy).r;
+	#else
+		float size = lerp(_V_WIRE_Size * 0.1, (_V_WIRE_Size / fixedSize) * 0.01, _V_WIRE_FixedSize);
 
-	#ifndef V_WIRE_ANTIALIASING_DISABLE
-		half3 width = abs(ddx(mass)) + abs(ddy(mass));
-		half3 eF = smoothstep(half3(0, 0, 0), width * size * 20, mass);
+		#ifndef V_WIRE_ANTIALIASING_DISABLE
+			half3 width = abs(ddx(mass)) + abs(ddy(mass));
+			half3 eF = smoothstep(half3(0, 0, 0), width * size * 20, mass);
 	
-		float w = size > 0 ? min(min(eF.x, eF.y), eF.z) : 1;
+			float w = size > 0 ? min(min(eF.x, eF.y), eF.z) : 1;
 
-		return w * w * w;
-	#else		
-		return step(size, min(min(mass.x, mass.y), mass.z));
+			return w * w * w;
+		#else		
+			return step(size, min(min(mass.x, mass.y), mass.z));
+		#endif
 	#endif
 }
  
-inline half WireOpaque(fixed4 wireTexColor, inout fixed4 srcColor, fixed3 mass, float wireFade, float fixedSize, half maskValue)
+inline half WireOpaque(fixed4 wireTexColor, inout fixed4 srcColor, fixed3 mass, float wireFade, float fixedSize, half maskValue, out float3 emission)
 {
 	half value = ExtructWireframeFromMass(mass, fixedSize);
 	
@@ -91,11 +112,14 @@ inline half WireOpaque(fixed4 wireTexColor, inout fixed4 srcColor, fixed3 mass, 
 
 	srcColor = lerp(lerp(srcColor, _V_WIRE_Color * wireTexColor, wireColorAlpha), srcColor, value);
 
+
+	emission = wireTexColor.rgb * _V_WIRE_Color.rgb * (1 - value) * wireColorAlpha * _V_WIRE_EmissionStrength * _V_WIRE_EmissionStrength * 10;
+
 	return value;
 }
 
 #ifdef V_WIRE_TRANSPARENT
-inline half WireTransparent(fixed4 wireTexColor, inout fixed4 srcColor, fixed3 mass, float wireFade, float fixedSize, half maskValue)
+inline half WireTransparent(fixed4 wireTexColor, inout fixed4 srcColor, fixed3 mass, float wireFade, float fixedSize, half maskValue, out float3 emission)
 {
 	half value = ExtructWireframeFromMass(mass, fixedSize);
 
@@ -123,12 +147,16 @@ inline half WireTransparent(fixed4 wireTexColor, inout fixed4 srcColor, fixed3 m
 	srcColor.rgb = lerp(wireColor.rgb, srcColor.rgb, value);
 	srcColor.a = saturate(srcColor.a + (1 - value) * wireColorAlpha);
 
+	
+	emission = wColor.rgb * (1 - value) * wireColorAlpha * _V_WIRE_EmissionStrength * _V_WIRE_EmissionStrength * 10;
+
+
 	return value;
 }
 #endif
 
 #ifdef V_WIRE_CUTOUT
-inline half WirCutout(fixed4 wireTexColor, inout fixed4 srcColor, fixed3 mass, float wireFade, float fixedSize, half maskValue, half customAlpha, half cutoff)
+inline half WirCutout(fixed4 wireTexColor, inout fixed4 srcColor, fixed3 mass, float wireFade, float fixedSize, half maskValue, half customAlpha, half cutoff, out float3 emission)
 {
 	half value = ExtructWireframeFromMass(mass, fixedSize);
 
@@ -143,12 +171,17 @@ inline half WirCutout(fixed4 wireTexColor, inout fixed4 srcColor, fixed3 mass, f
 		value = lerp(value, 1, maskValue); 
 	#endif 
 
-	 
+
+	fixed fade = lerp(1, wireFade, _V_WIRE_DistanceFade);
+
+	value = lerp(1, value, fade);
+
+	  
 	half clipValue = 1;
 	#ifdef V_WIRE_TRANSPARENCY_ON
 
-		wColor.rgb = lerp(srcColor.rgb, wColor.rgb, customAlpha);
-		srcColor.rgb = cutoff > 0.01 ? lerp(wColor.rgb, (srcColor.a - cutoff) > 0 ? srcColor.rgb : wColor.rgb, value) : lerp(wColor.rgb, srcColor.rgb, value);
+		half3 transColor = lerp(srcColor.rgb, wColor.rgb, customAlpha);
+		srcColor.rgb = cutoff > 0.01 ? lerp(transColor, (srcColor.a - cutoff) > 0 ? srcColor.rgb : transColor, value) : lerp(transColor, srcColor.rgb, value);
 
 		clipValue = srcColor.a - cutoff;
 		clipValue = (1 - value) * customAlpha > 0.5 ? 1 : clipValue;
@@ -162,7 +195,16 @@ inline half WirCutout(fixed4 wireTexColor, inout fixed4 srcColor, fixed3 mass, f
 	#endif
 
 
-	clipValue *= lerp(1, wireFade, _V_WIRE_DistanceFade);
+	
+	#ifdef V_WIRE_SHADOWCASTER	
+		emission = 0;
+	#else
+		emission = wColor.rgb * (1 - value) * _V_WIRE_EmissionStrength * _V_WIRE_EmissionStrength * 10;
+		#ifdef V_WIRE_TRANSPARENCY_ON
+			emission *= customAlpha;
+		#endif
+	#endif
+
 
 	return clipValue;
 }
@@ -195,11 +237,11 @@ inline half V_WIRE_DynamicMask(half3 maskPos)
 
 
 #if defined(V_WIRE_CUTOUT)
-#define DoWire(wireTexColor,srcColor,mass,wireFade,fixedsize,maskValue,customAlpha,cutoff) WirCutout(wireTexColor,srcColor,mass,wireFade,fixedsize,maskValue,customAlpha,cutoff)
+#define DoWire(wireTexColor,srcColor,mass,wireFade,fixedsize,maskValue,customAlpha,cutoff,emission) WirCutout(wireTexColor,srcColor,mass,wireFade,fixedsize,maskValue,customAlpha,cutoff,emission)
 #elif defined(V_WIRE_TRANSPARENT)
-#define DoWire(wireTexColor,srcColor,mass,wireFade,fixedsize,maskValue) WireTransparent(wireTexColor,srcColor,mass,wireFade,fixedsize,maskValue)
+#define DoWire(wireTexColor,srcColor,mass,wireFade,fixedsize,maskValue,emission) WireTransparent(wireTexColor,srcColor,mass,wireFade,fixedsize,maskValue,emission)
 #else
-#define DoWire(wireTexColor,srcColor,mass,wireFade,fixedsize,maskValue) WireOpaque(wireTexColor,srcColor,mass,wireFade,fixedsize,maskValue)
+#define DoWire(wireTexColor,srcColor,mass,wireFade,fixedsize,maskValue,emission) WireOpaque(wireTexColor,srcColor,mass,wireFade,fixedsize,maskValue,emission)
 #endif
 
 #endif
