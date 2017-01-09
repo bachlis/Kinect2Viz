@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityStandardAssets.ImageEffects;
 
 public class MouseDoubleOrbit : OSCControllable {
 
@@ -52,8 +53,20 @@ public class MouseDoubleOrbit : OSCControllable {
         this.lookAtLerpFactor = lookAtLerpFactor;
     }
 
-	// Update is called once per frame
-	public override void Update () {
+    [OSCMethod("setBloom")]
+    public void setBloom(int i)
+    {
+        gameObject.GetComponent<BloomOptimized>().enabled = i > 0;
+    }
+
+    [OSCMethod("setDof")]
+    public void setDof(int i)
+    {
+        gameObject.GetComponent<DepthOfField>().enabled = i > 0;
+    }
+
+    // Update is called once per frame
+    public override void Update () {
         if (t1 == null || t2 == null) return;
 
         if (Input.GetMouseButton(0))

@@ -1,0 +1,30 @@
+fileFormatVersion: 2
+guid: 1bf948a70c1fea7418e72f01a5b2cfee
+timeCreated: 1480355546
+licenseType: Pro
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - Helvetica Neue
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 11ff5cf02d78c1b40925247774ddb217, type: 3}
+  - {fileID: 12800000, guid: 19875bb13f6526f41a5af602ded4cedc, type: 3}
+  - {fileID: 12800000, guid: 0b884ad19081ef2458edc810280d1502, type: 3}
+  - {fileID: 12800000, guid: 13760d5686a847d41ab62c38acf72b76, type: 3}
+  - {fileID: 12800000, guid: 1b60a99611b37e741ab1aae74b5c1876, type: 3}
+  - {fileID: 12800000, guid: 0d58d0c72e1e8434281192673b5d24fe, type: 3}
+  - {fileID: 12800000, guid: 07ca27b9c6e95c14db89f3a81c2f740a, type: 3}
+  - {fileID: 12800000, guid: 07158c1d99b53f64481f548af42e5f6f, type: 3}
+  - {fileID: 12800000, guid: 05348b5fd552036438ff9ef71a279152, type: 3}
+  - {fileID: 12800000, guid: 1863c0ff2f985a040a2548be03d2f202, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
