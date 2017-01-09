@@ -178,6 +178,8 @@ fixed4 frag (v2f i) : SV_Target
 		fixed4 wireTexColor = tex2D(_V_WIRE_WireTex, i.uv.zw);
 		wireTexColor.rgb *= lerp(1, i.color.rgb, _V_WIRE_WireVertexColor);
 
+		float3 wireEmission = 0;
+
 		#ifdef V_WIRE_CUTOUT
 		
 			half customAlpha = 1;
@@ -188,8 +190,8 @@ fixed4 frag (v2f i) : SV_Target
 				
 				customAlpha = (customAlpha + _V_WIRE_TransparentTex_Alpha_Offset) < 0.01 ? 0 : 1;
 			#endif
-
-			half clipValue = DoWire(wireTexColor, retColor, i.mass, saturate(i.data.x), i.data.y, dynamicMask, customAlpha, _Cutoff);
+							
+			half clipValue = DoWire(wireTexColor, retColor, i.mass, saturate(i.data.x), i.data.y, dynamicMask, customAlpha, _Cutoff, wireEmission);
 
 
 			#ifdef V_WIRE_CUTOUT_HALF
@@ -211,9 +213,13 @@ fixed4 frag (v2f i) : SV_Target
 				_V_WIRE_Color.a *= customAlpha;
 			#endif
 				
-			DoWire(wireTexColor, retColor, i.mass, saturate(i.data.x), i.data.y, dynamicMask);
+			DoWire(wireTexColor, retColor, i.mass, saturate(i.data.x), i.data.y, dynamicMask, wireEmission);
 
 		#endif
+
+		//Emission
+		retColor.rgb += wireEmission;
+
 	#else
 
 		#ifdef V_WIRE_CUTOUT

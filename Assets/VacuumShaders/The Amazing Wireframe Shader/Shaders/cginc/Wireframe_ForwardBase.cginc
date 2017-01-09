@@ -364,8 +364,10 @@ fixed4 frag(vOutput i) : SV_Target
 		fixed4 wireTexColor = tex2D(_V_WIRE_WireTex, i.uv.zw);
 		wireTexColor.rgb *= lerp(1, i.vColor.rgb, _V_WIRE_WireVertexColor);
 
+		float3 wireEmission = 0;
+
 		#ifdef V_WIRE_CUTOUT
-		
+		 
 			half customAlpha = 1;
 			#ifdef V_WIRE_TRANSPARENCY_ON
 				customAlpha = wireTexColor.a;
@@ -375,7 +377,7 @@ fixed4 frag(vOutput i) : SV_Target
 				customAlpha = (customAlpha + _V_WIRE_TransparentTex_Alpha_Offset) < 0.01 ? 0 : 1;
 			#endif
 
-			half clipValue = DoWire(wireTexColor, retColor, i.mass.xyz, saturate(i.mass.w), i.worldPos.w, dynamicMask, customAlpha, _Cutoff);
+			half clipValue = DoWire(wireTexColor, retColor, i.mass.xyz, saturate(i.mass.w), i.worldPos.w, dynamicMask, customAlpha, _Cutoff, wireEmission);
 
 
 			#ifdef V_WIRE_CUTOUT_HALF
@@ -383,7 +385,7 @@ fixed4 frag(vOutput i) : SV_Target
 			#else
 				clip(clipValue);
 			#endif
-
+				 
 		#else 			
 
 			#ifdef V_WIRE_TRANSPARENCY_ON
@@ -399,11 +401,17 @@ fixed4 frag(vOutput i) : SV_Target
 			
 
 			#ifdef V_WIRE_FRESNEL_ON
-				_V_WIRE_Color.a *= i.normal.w;
+				_V_WIRE_Color.a *= i.normal.w;  
 			#endif	
-
-			DoWire(wireTexColor, retColor, i.mass.xyz, saturate(i.mass.w), i.worldPos.w, dynamicMask);
+							
+			DoWire(wireTexColor, retColor, i.mass.xyz, saturate(i.mass.w), i.worldPos.w, dynamicMask, wireEmission);
+			
 		#endif
+
+
+		//Emission
+		retColor.rgb += wireEmission;
+
 	#else
 
 		#ifdef V_WIRE_CUTOUT
@@ -412,7 +420,7 @@ fixed4 frag(vOutput i) : SV_Target
 
 	#endif
 
-	
+
 	//Fog
 	UNITY_APPLY_FOG(i.fogCoord, retColor);
 

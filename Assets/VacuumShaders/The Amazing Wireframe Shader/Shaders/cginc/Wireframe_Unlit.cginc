@@ -158,7 +158,7 @@ vOutput vert(vInput v)
 	UNITY_TRANSFER_FOG(o, o.pos);
 
 	#ifndef V_WIRE_NO
-		o.mass = ExtructWireframeFromVertexUV(v.texcoord);	
+		o.mass = ExtructWireframeFromVertexUV(v.texcoord);
 
 		o.data.y = distance(_WorldSpaceCameraPos, mul(unity_ObjectToWorld, v.vertex));
 
@@ -250,6 +250,8 @@ fixed4 frag(vOutput i) : SV_Target
 		fixed4 wireTexColor = tex2D(_V_WIRE_WireTex, i.uv.zw);
 		wireTexColor.rgb *= lerp(1, i.vColor.rgb, _V_WIRE_WireVertexColor);
 
+		float3 wireEmission = 0;
+
 		#ifdef V_WIRE_CUTOUT
 		
 			half customAlpha = 1;
@@ -261,7 +263,7 @@ fixed4 frag(vOutput i) : SV_Target
 				customAlpha = (customAlpha + _V_WIRE_TransparentTex_Alpha_Offset) < 0.01 ? 0 : 1;
 			#endif
 
-			half clipValue = DoWire(wireTexColor, retColor, i.mass, saturate(i.data.x), i.data.y, dynamicMask, customAlpha, _Cutoff);
+			half clipValue = DoWire(wireTexColor, retColor, i.mass, saturate(i.data.x), i.data.y, dynamicMask, customAlpha, _Cutoff, wireEmission);
 			 
 
 			#ifdef V_WIRE_CUTOUT_HALF
@@ -296,8 +298,12 @@ fixed4 frag(vOutput i) : SV_Target
 				_V_WIRE_Color.a *= i.normal.w;
 			#endif	
 
-			DoWire(wireTexColor, retColor, i.mass, saturate(i.data.x), i.data.y, dynamicMask);
+			DoWire(wireTexColor, retColor, i.mass, saturate(i.data.x), i.data.y, dynamicMask, wireEmission);
 		#endif
+
+		//Emission
+		retColor.rgb += wireEmission;
+
 	#else
 
 		#ifdef V_WIRE_CUTOUT

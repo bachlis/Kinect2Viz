@@ -154,6 +154,8 @@ void surf (Input IN, inout SurfaceOutputStandard o)
 			fixed4 wireTexColor = tex2D(_V_WIRE_WireTex, IN.texcoord1.xy);
 			wireTexColor.rgb *= lerp(1, IN.color.rgb, _V_WIRE_WireVertexColor);
 
+			float3 wireEmission = 0;
+
 			#ifdef V_WIRE_CUTOUT
 
 				half customAlpha = 1;
@@ -178,7 +180,7 @@ void surf (Input IN, inout SurfaceOutputStandard o)
 
 				float fixedSize = distance(_WorldSpaceCameraPos, IN.worldPos);
 
-				half clipValue = DoWire(wireTexColor, retColor, IN.mass, saturate(IN.texcoord1.z), fixedSize, dynamicMask, customAlpha, _Cutoff);
+				half clipValue = DoWire(wireTexColor, retColor, IN.mass, saturate(IN.texcoord1.z), fixedSize, dynamicMask, customAlpha, _Cutoff, wireEmission);
 
 
 				#ifdef V_WIRE_CUTOUT_HALF
@@ -213,7 +215,7 @@ void surf (Input IN, inout SurfaceOutputStandard o)
 
 				float fixedSize = distance(_WorldSpaceCameraPos, IN.worldPos);
 
-				half value = DoWire(wireTexColor, retColor, IN.mass, saturate(IN.texcoord1.z), fixedSize, dynamicMask);
+				half value = DoWire(wireTexColor, retColor, IN.mass, saturate(IN.texcoord1.z), fixedSize, dynamicMask, wireEmission);
 
 
 				#ifdef V_WIRE_DYNAMIC_MASK_ON
@@ -232,6 +234,10 @@ void surf (Input IN, inout SurfaceOutputStandard o)
 				#endif
 
 			#endif //V_WIRE_CUTOUT
+
+			//Emission
+			o.Emission = wireEmission;
+
 		#endif //V_WIRE_LIGHT_ON
 	#endif
 
@@ -246,6 +252,8 @@ void WireFinalColor (Input IN, SurfaceOutputStandard o, inout fixed4 color)
 
 		fixed4 wireTexColor = tex2D(_V_WIRE_WireTex, IN.texcoord1.xy);
 		wireTexColor.rgb *= lerp(1, IN.color.rgb, _V_WIRE_WireVertexColor);
+
+		float3 wireEmission = 0;
 
 		#ifdef V_WIRE_CUTOUT
 			
@@ -271,7 +279,7 @@ void WireFinalColor (Input IN, SurfaceOutputStandard o, inout fixed4 color)
 			
 			float fixedSize = distance(_WorldSpaceCameraPos, IN.worldPos);
 
-			half clipValue = DoWire(wireTexColor, color, IN.mass, saturate(IN.texcoord1.z), fixedSize, dynamicMask, customAlpha, _Cutoff);
+			half clipValue = DoWire(wireTexColor, color, IN.mass, saturate(IN.texcoord1.z), fixedSize, dynamicMask, customAlpha, _Cutoff, wireEmission);
 
 
 			#ifdef V_WIRE_CUTOUT_HALF
@@ -309,8 +317,10 @@ void WireFinalColor (Input IN, SurfaceOutputStandard o, inout fixed4 color)
 
 			float fixedSize = distance(_WorldSpaceCameraPos, IN.worldPos);
 
-			DoWire(wireTexColor, color, IN.mass, saturate(IN.texcoord1.z), fixedSize, dynamicMask);
+			DoWire(wireTexColor, color, IN.mass, saturate(IN.texcoord1.z), fixedSize, dynamicMask, wireEmission);
 		#endif
+
+		color.rgb += wireEmission;
 	#endif
 } 
 

@@ -1,3 +1,6 @@
+// Upgrade NOTE: replaced '_Projector' with 'unity_Projector'
+// Upgrade NOTE: replaced '_ProjectorClip' with 'unity_ProjectorClip'
+
 Shader "VacuumShaders/The Amazing Wireframe/Projector"
 {
 	Properties 
@@ -20,7 +23,7 @@ Shader "VacuumShaders/The Amazing Wireframe/Projector"
 
 		[Enum(Screen Space,0,Fixed,1)] _V_WIRE_FixedSize("Size", float) = 0
 		[V_WIRE_PositiveFloat] _V_WIRE_Size("    Value", Float) = 0.5
-		[V_WIRE_HDRColor] _V_WIRE_Color("", color) = (0, 0, 0, 1)
+		[HDR]_V_WIRE_Color("Color (HDR)", color) = (0, 0, 0, 1)
 	}
 	
 	Subshader 

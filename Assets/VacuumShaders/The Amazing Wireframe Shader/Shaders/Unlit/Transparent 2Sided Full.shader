@@ -40,15 +40,27 @@ Shader "Hidden/VacuumShaders/The Amazing Wireframe/Mobile/Unlit/Transparent/2 Si
 		[V_WIRE_VertexColor] _V_WIRE_VertexColor ("Vertex Color", float) = 0	
 
 		     
-		//Wire Options
-		[V_WIRE_Title] _V_WIRE_Title_W_Options("Wire Visual Options", float) = 0  		
+		//Wire S Options   
+		[V_WIRE_Title] _V_WIRE_Title_S_Options("Wire Source Options", float) = 0  		
 		
-		[Enum(Screen Space,0,Fixed,1)] _V_WIRE_FixedSize("Size", float) = 0
-		[V_WIRE_PositiveFloat] _V_WIRE_Size("    Value", Float) = 0.5
-		[V_WIRE_HDRColor] _V_WIRE_Color("", color) = (0, 0, 0, 1)
-		_V_WIRE_WireTex("Texture (RGB) Trans (A)", 2D) = "white"{}
+		//Source
+		[V_WIRE_Source] _V_WIRE_Source_Options ("", float) = 0
+		[HideInInspector] _V_WIRE_SourceTex("", 2D) = "white"{}
+		[HideInInspector] _V_WIRE_SourceTex_Scroll("", vector) = (0, 0, 0, 0)
+
+		[HideInInspector] _V_WIRE_FixedSize("", float) = 0
+		[HideInInspector] _V_WIRE_Size("", Float) = 0.5
+
+		//Wire Options  
+		[V_WIRE_Title] _V_WIRE_Title_W_Options("Wire Visual Options", float) = 0  
+
+		_V_WIRE_Color("Color", color) = (0, 0, 0, 1)
+		_V_WIRE_WireTex("Color Texture (RGBA)", 2D) = "white"{}
 		[V_WIRE_UVScroll] _V_WIRE_WireTex_Scroll("    ", vector) = (0, 0, 0, 0)
 		[Enum(UV0,0,UV1,1)] _V_WIRE_WireTex_UVSet("    UV Set", float) = 0
+
+		//Emission
+		[V_WIRE_PositiveFloat]_V_WIRE_EmissionStrength("Emission Strength", float) = 0
 
 		//Vertex Color
 		[V_WIRE_VertexColor] _V_WIRE_WireVertexColor("Vertex Color", Float) = 0
@@ -109,6 +121,8 @@ Shader "Hidden/VacuumShaders/The Amazing Wireframe/Mobile/Unlit/Transparent/2 Si
 			#pragma shader_feature V_WIRE_REFLECTION_OFF V_WIRE_REFLECTION_CUBE_SIMPLE V_WIRE_REFLECTION_CUBE_ADVANED V_WIRE_REFLECTION_UNITY_REFLECTION_PROBES
 			
 
+			#pragma shader_feature V_WIRE_SOURCE_BAKED V_WIRE_SOURCE_TEXTURE
+
 			#pragma shader_feature V_WIRE_TRANSPARENCY_OFF V_WIRE_TRANSPARENCY_ON
 			#pragma shader_feature V_WIRE_FRESNEL_OFF V_WIRE_FRESNEL_ON
 
@@ -140,6 +154,8 @@ Shader "Hidden/VacuumShaders/The Amazing Wireframe/Mobile/Unlit/Transparent/2 Si
 			#pragma shader_feature V_WIRE_IBL_OFF V_WIRE_IBL_ON 
 			#pragma shader_feature V_WIRE_REFLECTION_OFF V_WIRE_REFLECTION_CUBE_SIMPLE V_WIRE_REFLECTION_CUBE_ADVANED V_WIRE_REFLECTION_UNITY_REFLECTION_PROBES
 			
+
+			#pragma shader_feature V_WIRE_SOURCE_BAKED V_WIRE_SOURCE_TEXTURE
 
 			#pragma shader_feature V_WIRE_TRANSPARENCY_OFF V_WIRE_TRANSPARENCY_ON
 			#pragma shader_feature V_WIRE_FRESNEL_OFF V_WIRE_FRESNEL_ON
