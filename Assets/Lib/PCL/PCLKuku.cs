@@ -27,7 +27,7 @@ public class PCLKuku : OSCControllable
     public AnimationCurve alphaDecay;
     public Material lineMat;
 
-    [Range(0.005f, 1)]
+    [Range(0.005f, 0.1f)]
     [OSCProperty("maxDistance")]
     public float maxDistance;
     [OSCProperty("nearColor")]
@@ -99,7 +99,7 @@ public class PCLKuku : OSCControllable
         if (!processLines) return;
         if (linesReady)
         {
-            Debug.Log("Lines ready !");
+            //Debug.Log("Lines ready !");
             this.StartCoroutineAsync(processLinesAsync(), out linesTask);
         }
         else
@@ -119,7 +119,7 @@ public class PCLKuku : OSCControllable
         if (randomVectors.Length == 0)
         {
             randomVectors = new Vector3[handler.numTotalPoints];
-            Debug.Log("Here");
+            //Debug.Log("Here");
 
             yield return Ninja.JumpToUnity; //=> here's our ninja, following code runs on main thread.
             for (int i = 0; i < handler.numTotalPoints; i++)
@@ -128,7 +128,7 @@ public class PCLKuku : OSCControllable
 
             }
             yield return Ninja.JumpBack;
-            Debug.Log("Finish random");
+            //Debug.Log("Finish random");
         }
 
         if (shuffleRandom)

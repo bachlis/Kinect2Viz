@@ -39,6 +39,9 @@ public struct K1Cloud
     public Vector3[] points;
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = PCLConstants.NUM_K1_PIXELS)]
     public int[] goodPointIndices;
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = PCLConstants.NUM_K1_PIXELS * 4)]
+    public int[] quadIndices;
+    public int numQuads;
 };
 
 public struct K2Cloud

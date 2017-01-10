@@ -70,33 +70,20 @@ public class PCLHandler : MonoBehaviour {
         switch (dataTarget)
         {
             case DataTarget.Kinect1_1:
-                points = receiver.data.k1Clouds[0].points;
-                goodPointIndices = receiver.data.k1Clouds[0].goodPointIndices;
-                numGoodPoints = receiver.data.k1Clouds[0].numGoodPoints;
-                numTotalPoints = PCLConstants.NUM_K1_PIXELS;
-                pclCenter = receiver.data.k1Clouds[0].pclCenter;
-                pclWidth = PCLConstants.K1_PCL_WIDTH;
-                pclHeight = PCLConstants.K1_PCL_HEIGHT;
-                break;
-
             case DataTarget.Kinect1_2:
-                points = receiver.data.k1Clouds[1].points;
-                goodPointIndices = receiver.data.k1Clouds[1].goodPointIndices;
-                numGoodPoints = receiver.data.k1Clouds[1].numGoodPoints;
-                numTotalPoints = PCLConstants.NUM_K1_PIXELS;
-                pclCenter = receiver.data.k1Clouds[1].pclCenter;
-                pclWidth = PCLConstants.K1_PCL_WIDTH;
-                pclHeight = PCLConstants.K1_PCL_HEIGHT;
-                break;
-
             case DataTarget.Kinect1_3:
-                points = receiver.data.k1Clouds[2].points;
-                goodPointIndices = receiver.data.k1Clouds[2].goodPointIndices;
-                numGoodPoints = receiver.data.k1Clouds[2].numGoodPoints;
+                points = receiver.data.k1Clouds[(int)dataTarget].points;
+                goodPointIndices = receiver.data.k1Clouds[(int)dataTarget].goodPointIndices;
+                numGoodPoints = receiver.data.k1Clouds[(int)dataTarget].numGoodPoints;
+                pclCenter = receiver.data.k1Clouds[(int)dataTarget].pclCenter;
+
+                quadIndices = receiver.data.k1Clouds[(int)dataTarget].quadIndices;
+                numQuads = receiver.data.k1Clouds[(int)dataTarget].numQuads;
+
                 numTotalPoints = PCLConstants.NUM_K1_PIXELS;
-                pclCenter = receiver.data.k1Clouds[2].pclCenter;
                 pclWidth = PCLConstants.K1_PCL_WIDTH;
                 pclHeight = PCLConstants.K1_PCL_HEIGHT;
+
                 break;
 
             case DataTarget.Kinect2:

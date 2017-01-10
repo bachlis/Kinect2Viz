@@ -16,12 +16,18 @@ public class PCLMesh : OSCControllable {
     [OSCProperty("shuffleRandom")]
     public bool shuffleRandom;
 
+    public bool onlyWhenBodyDetected;
+    public bool useROIWhenNobody;
+    public BoxCollider roiCollider;
+
     // Use this for initialization
     public override void Start () {
         handler = GetComponent<PCLHandler>();
         m = new Mesh();
         GetComponent<MeshFilter>().sharedMesh = m;
         randomVectors = new Vector3[0];
+
+        Debug.Log("Start");
 	}
 	
     [OSCMethod("active")]
@@ -40,7 +46,7 @@ public class PCLMesh : OSCControllable {
     // Update is called once per frame
     public override void Update () {
 
-        if (handler.numBodiesTracked == 0)
+        if (handler.numBodiesTracked == 0 && onlyWhenBodyDetected)
         {
             m.Clear();
             return;
@@ -81,7 +87,7 @@ public class PCLMesh : OSCControllable {
             float uvY = Mathf.Floor(pIndex / handler.pclWidth) * 1.0f / handler.pclHeight;
             uvs[i] = new Vector2(uvX, uvY);
         }
-        
+
 
         for(int i=0;i<handler.numQuads;i++)
         {
