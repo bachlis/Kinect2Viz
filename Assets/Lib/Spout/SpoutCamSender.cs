@@ -64,7 +64,7 @@ namespace Spout{
                 texture = new RenderTexture(textureWidth, textureHeight, 0,RenderTextureFormat.ARGB32);
                 texture.antiAliasing = 1;
                 texture.depth = 24;
-
+                texture.useMipMap = false;
                 texture.Create();
                 _cam.targetTexture = texture;
 
@@ -164,7 +164,7 @@ namespace Spout{
         {
             if (Application.isPlaying && showTexture)
             {
-                GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), texture);
+                GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), texture,ScaleMode.ScaleToFit,false);
             }
         }
 
