@@ -20,6 +20,7 @@ namespace UTJ
         public string m_pathToAbc;
         public float m_maxEndTime = 0.0f;
         public float m_time;
+        public bool manualPlay;
     
         [Header("Playback")]
         public float m_startTime = 0.0f;
@@ -507,7 +508,7 @@ namespace UTJ
     
         void Update()
         {
-            if (Application.isPlaying)
+            if (Application.isPlaying && !manualPlay)
             {
                 AbcUpdateBegin(Time.time);
             }
