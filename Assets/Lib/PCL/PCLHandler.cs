@@ -116,8 +116,11 @@ public class PCLHandler : MonoBehaviour {
                 pclHeight = PCLConstants.RS_PCL_HEIGHT;
                 break;
         }
+    }
 
-        
+    public Vector3 getJointWorldPosition(int index)
+    {
+        return transform.TransformPoint(joints[Mathf.Clamp(index, 0, joints.Length)]);
     }
 
     void OnDrawGizmos()

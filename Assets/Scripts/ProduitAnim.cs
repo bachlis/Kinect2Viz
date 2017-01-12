@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 
-public class ProduitAnim : MonoBehaviour {
+public class ProduitAnim : OSCControllable {
 
     public Transform[] groups;
     List<Transform> objects;
@@ -13,23 +13,30 @@ public class ProduitAnim : MonoBehaviour {
     public int currentIndex = 0;
 
     [Header("Animation")]
+    [OSCProperty("upFactor")]
     public float upFactor = .1f;
+    [OSCProperty("rotateSpeed")]
     public float rotateSpeed = 100;
+    [OSCProperty("rotateRandom")]
     public float rotateRandom = 10;
 
     [Header("Target")]
     public Transform target;
+    [OSCProperty("minDist")]
     public float minDist = 1;
+    [OSCProperty("detachDistOffset")]
     public float detachDistOffset = .1f;
 
     [Header("Details")]
     Transform details;
     Vector3 initDetailsScale;
+    [OSCProperty("detailsUpFactor")]
     public float detailsUpFactor = 1;
+    [OSCProperty("detailsLookAtYOffset")]
     public float detailsLookAtYOffset = 1;
 
 	// Use this for initialization
-	void Start () {
+	override public void Start () {
         objects = new List<Transform>();
         initPos = new List<Vector3>();
         initRot = new List<Vector3>();
@@ -51,7 +58,7 @@ public class ProduitAnim : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	override public void Update () {
         if(currentIndex != -1)
         {
             if (Vector3.Distance(objects[currentIndex].position, target.position) > minDist + detachDistOffset)
