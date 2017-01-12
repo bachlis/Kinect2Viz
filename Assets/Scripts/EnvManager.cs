@@ -25,6 +25,7 @@ public class EnvManager : OSCControllable {
         {
             _lastIndex = colorIndex;
             skybox.SetColor("_Tint", colors[Mathf.Clamp(colorIndex, 0, colors.Length - 1)]);
+            DynamicGI.UpdateEnvironment();
         }
 	}
 }
