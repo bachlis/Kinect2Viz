@@ -3,24 +3,26 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [ExecuteInEditMode]
-public class EnvManager : OSCControllable {
+public class EnvManager : MonoBehaviour {
 
     public Material skybox;
     public Color32[] colors;
 
-    [OSCProperty("colorIndex")]
+   // [OSCProperty("colorIndex")]
     public int colorIndex;
     int _lastIndex;
 
     public bool permanentUpdate;
+
     
+     
 	// Use this for initialization
-	override public void Start () {
+	void Start () {
         _lastIndex = -1;
 	}
 	
 	// Update is called once per frame
-	override public void Update () {
+	void Update () {
 		if(colorIndex != _lastIndex || permanentUpdate)
         {
             _lastIndex = colorIndex;

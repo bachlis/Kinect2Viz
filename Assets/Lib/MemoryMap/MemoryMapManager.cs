@@ -52,7 +52,7 @@ public class MemoryMapManager : MonoBehaviour{
 
        if(!isConnected)
         {
-            Debug.Log("Connect..");
+            //Debug.Log("Connect..");
             isConnected = Native.Invoke<bool,connectMemoryShare_C>(nativeLibraryPtr); // Should return the number 50.
             if (isConnected) Debug.Log("Connected !");
         }

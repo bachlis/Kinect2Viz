@@ -1,14 +1,18 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using Spout;
+
+[RequireComponent(typeof(MeshFilter))]
+[RequireComponent(typeof(MeshRenderer))]
 public class PCLMesh : OSCControllable {
 
     Mesh m;
-    
     PCLHandler handler;
 
-
     public bool isActive = false;
+
+    
 
     Vector3[] randomVectors;
     [OSCProperty("randomFactor")]
@@ -35,6 +39,15 @@ public class PCLMesh : OSCControllable {
     {
         m.Clear();
         isActive = value;
+    }
+
+    [OSCMethod("useRGB")]
+    public void setUseRGB(bool value)
+    {
+        if (GetComponent<SpoutReceiver>())
+        {
+            GetComponent<SpoutReceiver>().enabled = value;
+        }
     }
 
     [OSCMethod("color")]

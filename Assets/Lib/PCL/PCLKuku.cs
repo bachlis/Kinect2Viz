@@ -25,8 +25,15 @@ public class PCLKuku : OSCControllable
 
     [Header("Rendering")]
     public AnimationCurve alphaDecay;
-    public Material lineMat;
+    public Material[] lineMats;
+    int lineMatIndex = 0;
 
+    [OSCMethod("material")]
+    public void setLineMat(int index)
+    {
+        lineMatIndex = Mathf.Clamp(index, 0, lineMats.Length);
+    }
+      
     [Range(0.005f, 0.1f)]
     [OSCProperty("maxDistance")]
     public float maxDistance;
@@ -208,12 +215,12 @@ public class PCLKuku : OSCControllable
         if (links == null) return;
 
 
-        lineMat.SetPass(0);
+        lineMats[lineMatIndex].SetPass(0);
         GL.PushMatrix();
         //GL.MultMatrix(Matrix4x4.TRS(transform.position, transform.rotation, transform.lossyScale));
         GL.Begin(GL.LINES);
 
-        if (drawLines)
+        if (drawLines && processLines)
         {
             foreach (KukuLink kl in links)
             {

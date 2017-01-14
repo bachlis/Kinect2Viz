@@ -8,7 +8,7 @@ public class PCLHandler : MonoBehaviour {
     public enum DataTarget { Kinect1_1, Kinect1_2, Kinect1_3, Kinect2, RealSense };
     public DataTarget dataTarget;
 
-    PCLDataReceiver receiver;
+    public PCLDataReceiver receiver;
 
     public Vector3[] points { get; private set; }
     public int[] goodPointIndices { get; private set; }
@@ -30,7 +30,6 @@ public class PCLHandler : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        receiver = GetComponentInParent<PCLDataReceiver>();
         switch (dataTarget)
         {
             case DataTarget.Kinect1_1:

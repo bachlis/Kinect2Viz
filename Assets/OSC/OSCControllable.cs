@@ -18,12 +18,10 @@ public class OSCControllable : MonoBehaviour {
         
         Type t = GetType();
         FieldInfo[] objectFields = t.GetFields(BindingFlags.Instance | BindingFlags.Public);
-
         for (int i = 0; i < objectFields.Length; i++)
         {
             FieldInfo info = objectFields[i];
             OSCProperty attribute = Attribute.GetCustomAttribute(info, typeof(OSCProperty)) as OSCProperty;
-            
             if (attribute != null)
             {
                 oscProperties.Add(new KeyValuePair<string, FieldInfo>(attribute.address,info));
@@ -36,15 +34,17 @@ public class OSCControllable : MonoBehaviour {
 
         MethodInfo[] methodFields = t.GetMethods(BindingFlags.Instance | BindingFlags.Public);
 
-        for (int i = 0; i < objectFields.Length; i++)
+        for (int i = 0; i < methodFields.Length; i++)
         {
             MethodInfo info = methodFields[i];
             OSCMethod attribute = Attribute.GetCustomAttribute(info, typeof(OSCMethod)) as OSCMethod;
-
             if (attribute != null)
             {
                 oscMethods.Add(new KeyValuePair<string, MethodInfo>(attribute.address, info));
+               
             }
+
+           
         }
     }
 
@@ -52,6 +52,7 @@ public class OSCControllable : MonoBehaviour {
 
     public void setProp(string property, List<object> values)
     {
+        
         if (oscProperties == null || oscMethods == null) init();
 
         FieldInfo info = getPropInfoForAddress(property);
@@ -118,6 +119,7 @@ public class OSCControllable : MonoBehaviour {
         object[] parameters = new object[info.GetParameters().Length];
 
         //Debug.Log("Set Method, num expected parameters : " + parameters.Length);
+
         int valueIndex = 0;
         for(int i=0;i<parameters.Length;i++)
         {

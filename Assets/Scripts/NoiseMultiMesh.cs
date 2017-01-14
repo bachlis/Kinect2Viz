@@ -3,8 +3,8 @@ using System.Collections;
 
 public class NoiseMultiMesh : OSCControllable
 {
-    MeshFilter[] mm;
-    Mesh m;
+
+    Mesh[] m;
     int[] numVertices;
     Vector3[][] initVertices;
     float[][] seeds;
@@ -20,37 +20,43 @@ public class NoiseMultiMesh : OSCControllable
     // Use this for initialization
     public override void Start()
     {
-     /*   mm = GetComponentsInChildren<MeshFilter>();
-        for(int j = 0; j < mm.Length; j++)
-        {
-            m = mm[j].mesh;
-            numVertices[j] = m.vertexCount;
-            initVertices[j] = new Vector3[numVertices[j]];
-            seeds[j] = new float[numVertices[j]];
+        MeshFilter[] filters = GetComponentsInChildren<MeshFilter>();
+        m = new Mesh[filters.Length];
+        initVertices = new Vector3[filters.Length][];
+        seeds = new float[filters.Length][];
+        numVertices = new int[filters.Length];
 
-            for (int i = 0; i < numVertices[j]; i++)
+        for(int f=0;f<filters.Length;f++)
+        {
+            m[f] = filters[f].mesh;
+            numVertices[f] = m[f].vertexCount;
+            initVertices[f] = new Vector3[numVertices[f]];
+            seeds[f] = new float[numVertices[f]];
+
+            for (int i = 0; i < numVertices[f]; i++)
             {
-                initVertices[j][i] = m.vertices[i];
-                seeds[j][i] = Random.value;
+                initVertices[f][i] = m[f].vertices[i];
+                seeds[f][i] = Random.value;
             }
         }
-        //*/
+        
     }
 
     // Update is called once per frame
     public override void Update()
     {
-      /*  for (int j = 0; j < mm.Length; j++)
+        for(int f=0;f<m.Length;f++)
         {
-            Vector3[] vertices = mm[j].mesh.vertices;
+            Vector3[] vertices = m[f].vertices;
 
-            for (int i = 0; i < numVertices[j]; i++)
+            for (int i = 0; i < numVertices[f]; i++)
             {
-                Vector3 target = initVertices[j][i] + Random.insideUnitSphere * amplitude;
-                vertices[i] = Vector3.Lerp(vertices[i], target, Time.deltaTime * seeds[j][i] * speed);
+                Vector3 target = initVertices[f][i] + Random.insideUnitSphere * amplitude;
+                vertices[i] = Vector3.Lerp(vertices[i], target, Time.deltaTime * seeds[f][i] * speed);
             }
 
-            m.vertices = vertices;
-        }//*/
+            m[f].vertices = vertices;
+        }
+        
     }
 }

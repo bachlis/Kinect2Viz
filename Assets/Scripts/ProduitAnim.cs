@@ -29,6 +29,7 @@ public class ProduitAnim : OSCControllable {
 
     [Header("Details")]
     Transform details;
+    ProduitText detailsTF;
     Vector3 initDetailsScale;
     [OSCProperty("detailsUpFactor")]
     public float detailsUpFactor = 1;
@@ -53,6 +54,7 @@ public class ProduitAnim : OSCControllable {
         }
 
         details = transform.FindChild("ProduitDetails").GetComponent<Transform>();
+        detailsTF = details.FindChild("TF").GetComponent<ProduitText>();
         initDetailsScale = details.localScale;
         details.localScale = Vector3.zero;
 	}
@@ -117,7 +119,9 @@ public class ProduitAnim : OSCControllable {
             details.DOScale(Vector3.zero, .3f).SetEase(Ease.InOutQuad).OnComplete(detailsZeroComplete);
             objects[currentIndex].DOMove(initPos[currentIndex] + Vector3.up * upFactor, .5f).OnComplete(upTweenComplete);
             objects[currentIndex].DORotate(Random.onUnitSphere*rotateRandom, .5f).OnComplete(upTweenComplete);
-        }else
+            ProduitDescription desc = objects[currentIndex].GetComponent<ProduitDescription>();
+            detailsTF.GetComponent<TextMesh>().text = desc != null ? desc.text : detailsTF.baseText;
+        } else
         {
             details.DOScale(Vector3.zero, .3f).SetEase(Ease.InOutQuad);
         }

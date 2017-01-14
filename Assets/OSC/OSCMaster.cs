@@ -21,17 +21,18 @@ public class OSCMaster : MonoBehaviour {
 
     void packetReceived(OSCPacket p)
     {
-        //Debug.Log("Received packet");
+        
         OSCMessage m = (OSCMessage)p;
+        
         string[] addSplit = m.Address.Split(new char[] { '/' });
 
         if (addSplit.Length != 3) return;
 
-        string target = addSplit[1];
+         string target = addSplit[1];
         string property = addSplit[2];
 
+        //Debug.Log("Message received for Target : " + target + ", property = " + property);
 
-        
         OSCControllable c = getControllableForID(target);
         if (c == null) return;
         

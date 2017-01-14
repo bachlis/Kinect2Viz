@@ -21,6 +21,7 @@ namespace UTJ
         public float m_maxEndTime = 0.0f;
         public float m_time;
         public bool manualPlay;
+        public float refTime;
     
         [Header("Playback")]
         public float m_startTime = 0.0f;
@@ -470,6 +471,7 @@ namespace UTJ
     
         public void Awake()
         {
+            refTime = Time.time;
             AbcLoad();
             AbcAPI.aiEnableFileLog(m_logToFile, m_logPath);
         }
@@ -510,12 +512,25 @@ namespace UTJ
         {
             if (Application.isPlaying && !manualPlay)
             {
-                AbcUpdateBegin(Time.time);
+                AbcUpdateBegin(Time.time-refTime);
             }
             else
             {
                 AbcUpdateBegin(m_time);
             }
+        }
+
+        public void setTimeAndPlay(float time)
+        {
+            manualPlay = false;
+            refTime = Time.time-time;
+
+        }
+
+        public void setManualPlay(bool value)
+        {
+            manualPlay = value;
+            if (!manualPlay) refTime = Time.time-m_time;
         }
     
         void LateUpdate()

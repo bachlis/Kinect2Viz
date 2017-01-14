@@ -10,15 +10,16 @@ using System;
 
 namespace Spout{
 [Serializable]
-	[ExecuteInEditMode]
 	public class SpoutReceiver : MonoBehaviour {
 
 		#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
 
 		[SerializeField]
 		private string _sharingName;
+        public bool useSharedMaterial;
 
-		private Texture2D _texture;
+        private Texture2D _texture;
+        
 		// leave false in this version!
 		//private bool debugConsole = false;
 
@@ -145,8 +146,9 @@ namespace Spout{
 				if(_texture == null) _texture = Spout.nullTexture;
 				if(GetComponent<Renderer>() != null)
 				{
-					GetComponent<Renderer>().sharedMaterial.mainTexture = _texture;
-				}
+					if(useSharedMaterial) GetComponent<Renderer>().sharedMaterial.mainTexture = _texture;
+                    else GetComponent<Renderer>().material.mainTexture = _texture;
+                }
 			}
 		}
 		[SerializeField]

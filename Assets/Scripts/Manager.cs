@@ -7,9 +7,11 @@ public class Manager : OSCControllable
     [OSCProperty("decor")]
     public int decor_chooser = 0;
     int decor_chooser_old = 0;
-
     public EnvManager envManager;
-    public bool synchroEnv;
+
+
+    
+
     
     public override void Start()
     {
@@ -31,5 +33,12 @@ public class Manager : OSCControllable
 
             envManager.colorIndex = Mathf.Clamp(decor_chooser - 1, 0, envManager.colors.Length - 1);
         }
+    }
+
+    [OSCMethod("envColor")]
+    public void setColorAt(int index, Color col)
+    {
+        if (index < 0 && index >= envManager.colors.Length) return;
+        envManager.colors[index] = col;
     }
 }
