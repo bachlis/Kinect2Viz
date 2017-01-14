@@ -11,8 +11,7 @@ public class ProduitAnim : OSCControllable {
     List<Vector3> initRot;
     List<Vector3> initScales;
 
-    public int currentIndex = 0;
-
+    
     [Header("Animation")]
     [OSCProperty("upFactor")]
     public float upFactor = .1f;
@@ -44,7 +43,8 @@ public class ProduitAnim : OSCControllable {
     Vector3 initDetailsScale;
 
     PanierControl panier;
-    int clickingIndex = -1;
+    public int currentIndex = 0;
+    public int clickingIndex = -1;
     bool clicking;
 
     // Use this for initialization
@@ -74,6 +74,7 @@ public class ProduitAnim : OSCControllable {
 
         initDetailsScale = details.localScale;
         details.localScale = Vector3.zero;
+
 	}
 	
 	// Update is called once per frame
@@ -181,8 +182,7 @@ public class ProduitAnim : OSCControllable {
     {
         details.DOScale(initDetailsScale, .3f);
     }
-
-
+    
     [OSCMethod("clicProduit")]
     public void clicProduit(Color startColor, float startScale, float time)
     {

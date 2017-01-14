@@ -8,6 +8,7 @@ public class OSCControllable : MonoBehaviour {
 
 
     public string oscName;
+    public bool debugOSC;
     public List<KeyValuePair<string,FieldInfo>> oscProperties;
     public List<KeyValuePair<string, MethodInfo>> oscMethods;
 
@@ -76,7 +77,7 @@ public class OSCControllable : MonoBehaviour {
    { 
         string typeString = info.FieldType.ToString();
 
-        //Debug.Log("OSC IN TYPE : " + typeString +" " + values[0].ToString());
+        if(debugOSC) Debug.Log("OSC Field IN TYPE : " + typeString +" " + values[0].ToString());
 
         // if we detect any attribute print out the data.
 
@@ -118,7 +119,7 @@ public class OSCControllable : MonoBehaviour {
 
         object[] parameters = new object[info.GetParameters().Length];
 
-        //Debug.Log("Set Method, num expected parameters : " + parameters.Length);
+        if(debugOSC) Debug.Log("Set Method, num expected parameters : " + parameters.Length);
 
         int valueIndex = 0;
         for(int i=0;i<parameters.Length;i++)

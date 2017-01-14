@@ -7,16 +7,21 @@ public class OSCMaster : MonoBehaviour {
 
     OSCServer server;
     public int port = 6000;
+    public bool debugMessage;
 
     OSCControllable[] controllables;
     
 	// Use this for initialization
-	void Start () {
+	void Awake () {
         server = new OSCServer(port);
         server.PacketReceivedEvent += packetReceived;
         server.Connect();
 
         controllables = FindObjectsOfType<OSCControllable>();
+        foreach(OSCControllable c in controllables)
+        {
+            Debug.Log("Add controllable : " + c.oscName);
+        }
 	}
 
     void packetReceived(OSCPacket p)
@@ -31,7 +36,7 @@ public class OSCMaster : MonoBehaviour {
          string target = addSplit[1];
         string property = addSplit[2];
 
-        //Debug.Log("Message received for Target : " + target + ", property = " + property);
+        if(debugMessage) Debug.Log("Message received for Target : " + target + ", property = " + property);
 
         OSCControllable c = getControllableForID(target);
         if (c == null) return;

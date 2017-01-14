@@ -40,7 +40,7 @@ public class PanierControl : OSCControllable {
         GUI.DrawTexture(new Rect(panierPos.x, panierPos.y, panierSize.x, panierSize.y), panierTex);
         GUI.color = Color.black;
         GUIStyle style = new GUIStyle();
-        style.fontSize = 60;
+        style.fontSize = (int)fontSize;
         style.alignment = TextAnchor.MiddleCenter;
         GUI.Label(new Rect(panierPos.x+textPos.x, panierPos.y+textPos.y, panierSize.x, panierSize.y), numItems.ToString(),style);
 
